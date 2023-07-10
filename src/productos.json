@@ -1,1 +1,1 @@
-[{"id":1,"title":"Zapatilla","description":"Zapa nike","code":"AAA123","price":1500,"status":true,"stock":3,"category":"Good","thumbnail":["ruta1","ruta2","ruta3"]}]
+[{"id":1,"title":"Zapatilla","description":"Zapa nike","code":"AAA123","price":1500,"status":true,"stock":3,"category":"Good","thumbnail":["ruta1","ruta2","ruta3"]},{"id":2,"title":"Remera","description":"Remera nike","code":"AAA123","price":1500,"status":true,"stock":3,"category":"Good","thumbnail":["ruta1","ruta2","ruta3"]}]

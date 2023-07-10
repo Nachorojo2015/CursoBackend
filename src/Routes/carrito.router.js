@@ -4,51 +4,62 @@ import productos from "../productos.json" assert {type : "json"}
 
 const router = Router()
 
-let idCarrito = 0
 router.post("/",(req,res)=>{
-    fs.writeFileSync("carrito.json",JSON.stringify([]))
-    let carrito = fs.readFileSync("carrito.json","utf-8")
-    return res.json({message: "Carrito creado" , id: idCarrito, products : JSON.parse(carrito)})
+    if(!fs.existsSync("carrito.json")){
+        fs.writeFileSync("carrito.json",JSON.stringify([]))
+        return res.json({message: "Carrito creado"})
+    }else{
+      let arrayCarrito = fs.readFileSync("carrito.json","utf-8")
+      let carrito = JSON.parse(arrayCarrito)
+      let id = carrito.length + 1
+      carrito.push({id: id, products : []})
+      fs.writeFileSync("carrito.json",JSON.stringify(carrito))
+      return res.json({message: "Carrito creado", id:id, products : []})
+    }
 })
 
 router.get("/:cid",(req,res)=>{
      const {cid} = req.params
-     if(+cid === idCarrito){
-        let arrayCarrito = fs.readFileSync("carrito.json","utf-8")
-        let carrito = JSON.parse(arrayCarrito)
-        res.json({message: "Carrito seleccionado", data : carrito})
+     let carritos = fs.readFileSync("carrito.json","utf-8")
+     let arrayCarritos = JSON.parse(carritos)
+     let carrito = arrayCarritos.find((carrito)=>carrito.id === +cid)
+     if(carrito){
+        let productos = carrito.products
+        res.json({message: "Estos son los productos del carrito", id: carrito.id, products : productos})
      }else{
-       res.status(404).json({message: "Carrito no existente"})
+        res.status(404).json({message: "Carrito no encontrado"})
      }
 })
 
 router.post("/:cid/product/:pid",(req,res)=>{
-      const {cid,pid} = req.params
-      if(+cid === idCarrito){
-         let producto = productos.find((producto)=>producto.id === +pid)
-         if(producto){
-             let arrayCarrito = fs.readFileSync("carrito.json","utf-8")
-             let carrito = JSON.parse(arrayCarrito)
-             if(carrito.some((productoCarrito)=>productoCarrito.product === producto.id)){
-                 let productoCarrito = carrito.find((productoCarrito)=>productoCarrito.product === producto.id)
-                 productoCarrito.quantity++
-                 fs.writeFileSync("carrito.json",JSON.stringify(carrito))
-                 res.json({message: "Producto sumado", data: productoCarrito})
-             }else{
-                let productoCarrito = {
-                    product : producto.id,
-                    quantity : 1
-               }
-               carrito.push(productoCarrito)
-               fs.writeFileSync("carrito.json",JSON.stringify(carrito))
-               return res.json({message: "Producto agregado correctamente", data: productoCarrito})
+  const {cid,pid} = req.params
+  let carritos = fs.readFileSync("carrito.json","utf-8")
+  let arrayCarritos = JSON.parse(carritos)
+  let carrito = arrayCarritos.find((carrito)=>carrito.id === +cid)
+  let carritoArray = carrito.products
+  if(carrito){
+      let productoSeleccionado = productos.find((producto)=>producto.id === +pid)
+      if(productoSeleccionado){
+          if(carritoArray.some((productoCarrito)=>productoCarrito.product === productoSeleccionado.id)){
+             let productoCarrito = carritoArray.find((productoCarrito)=>productoCarrito.product === productoSeleccionado.id)
+             productoCarrito.quantity++
+             fs.writeFileSync("carrito.json",JSON.stringify(arrayCarritos))
+             return res.json({message : "Producto sumado correctamente", data: productoCarrito})
+          }else{
+             let productoCarrito = {
+                product : productoSeleccionado.id,
+                quantity : 1
              }
-         }else{
-            res.status(404).json({message: "Producto no encontrado"})
-         }
+             carritoArray.push(productoCarrito)
+             fs.writeFileSync("carrito.json",JSON.stringify(arrayCarritos))
+             return res.json({message: "Producto agregado correctamente"})
+          }
       }else{
-        return res.status(404).json({message: "Carrito no encontrado", id: idCarrito})
+        return res.status(404).json({message: "Producto no encontrado"})
       }
+  }else{
+    return res.status(404).json({message: "Carrito no encontrado"})
+  }
 })
 
 export default router
