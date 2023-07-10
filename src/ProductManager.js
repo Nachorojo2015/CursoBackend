@@ -1,6 +1,5 @@
 import fs from "fs"
 
-
 class ProductManager{
     constructor(path){
         this.path = path
@@ -9,15 +8,15 @@ class ProductManager{
         }
     }
 
-    static id = 0
-
    async addProduct(product){
         try{
             if(!product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock){
                 throw new Error("Todos los campos deben ser obligatorios")
             }else{
-                ProductManager.id++
-                product.id = ProductManager.id
+                let arrayProductos = fs.readFileSync(this.path,"utf-8")
+                let productos = JSON.parse(arrayProductos)
+                let id = productos.length + 1
+                product.id = id
             }
             let arrProductos = fs.readFileSync(this.path,"utf-8")
             let productos = JSON.parse(arrProductos)
@@ -83,8 +82,6 @@ class ProductManager{
     }
 }
 
-const ListaProductos = new ProductManager("productos.json")
-
 let producto1 = {
     title : "Pantalon Nike",
     description : "Pantalon largo marca Nike",
@@ -112,16 +109,13 @@ let producto3 = {
     stock : 9
 }
 
-ListaProductos.addProduct(producto1)
-ListaProductos.addProduct(producto2)
-ListaProductos.addProduct(producto3)
-// ListaProductos.getProductos()
-// .then((data)=>console.log(data))
-// .catch((error)=>console.log(error))
-// ListaProductos.getProductById(2)
-// .then((data)=>console.log(data))
-// .catch((error)=>console.log(error))
-// ListaProductos.updateProduct(1,"title","Pulover")
-// ListaProductos.deleteProduct(1)
+const manager = new ProductManager("productos.json")
+
+manager.addProduct(producto1)
+manager.addProduct(producto2)
+manager.addProduct(producto3)
+
+
+
 
 export default ProductManager
