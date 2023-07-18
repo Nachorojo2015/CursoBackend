@@ -8,7 +8,7 @@ router.get("/",(req,res)=>{
 })
 
 router.get("/realTimeProducts",(req,res)=>{
-    res.render("realTimeProducts",{title: "Productos en tiempo real", style : "timeProducts.css", productos : productos, })
+    res.render("realTimeProducts",{title: "Productos en tiempo real"})
 })
 
 
