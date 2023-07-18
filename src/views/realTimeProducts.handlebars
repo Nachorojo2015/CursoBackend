@@ -1,0 +1,38 @@
+<h1>Modificar Productos</h1>
+<div style="display: flex;" style="flex-wrap: wrap;" id="contenedor">
+  {{!-- Se llena con el index.js --}}
+</div>
+<br>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal1">
+  Agregar Producto
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Crear Producto</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="productForm">
+        <input type="text" placeholder="Ingrese nombre" id="nombre">
+        <input type="text" placeholder="Ingrese descripción" id="descripcion">
+        <input type="text" placeholder="Ingrese codigo" id="codigo">
+        <input type="text" placeholder="Ingrese precio" id="precio">
+        <input type="text" placeholder="Ingrese stock" id="stock">
+        <input type="text" placeholder="Ingrese categoria" id="categoria">
+        <input type="text" placeholder="Ingrese rutas" id="rutas">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> 
+      </div>
+    </div>
+  </div>
+</div>
+
+

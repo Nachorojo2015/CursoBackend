@@ -1,0 +1,21 @@
+<h1>Productos</h1>
+<div style="display: flex;">
+    {{#each productos}}
+ <div class="card" style="width: 18rem;">
+  <img src="{{this.thumbnail}}" className="card-img-top" alt="{{this.title}}">
+  <div class="card-body">
+    <h5 class="card-title">{{this.title}}</h5>
+    <p class="card-text">{{this.description}}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">{{this.code}}</li>
+    <li class="list-group-item">${{this.price}}</li>
+    <li class="list-group-item">Stock: {{this.stock}}</li>
+  </ul>
+  <div class="card-body">
+    <a href="#" class="card-link">{{this.status}}</a>
+    <a href="#" class="card-link">{{this.category}}</a>
+  </div>
+</div>
+    {{/each}}
+</div>

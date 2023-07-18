@@ -12,9 +12,9 @@ router.get("/",(req,res)=>{
         for(let i = 0; i < limit; i++){
             productosLimite.push(productos[i])
         }
-        res.json({message : "Productos cargados" , data : productosLimite})
+        res.json({title: "Productos seleccionados", productos: productosLimite})
     }else{
-        res.json({message: "Todos los productos" , data : productos})
+        res.json({title: "Todos los productos" , productos : productos})
     }
 })
 
