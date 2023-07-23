@@ -36,30 +36,23 @@ let formAgregar = document.getElementById('productForm')
 
 formAgregar.addEventListener('submit',(e)=>{
     e.preventDefault()
-    let name = document.getElementById('nombre').value
-    let descripcion = document.getElementById('descripcion').value
-    let codigo = document.getElementById('codigo').value
-    let precio = document.getElementById('precio').value
+    let title = document.getElementById('nombre').value
+    let description = document.getElementById('descripcion').value
+    let code = document.getElementById('codigo').value
+    let price = document.getElementById('precio').value
     let stock = document.getElementById('stock').value
-    let categoria = document.getElementById('categoria').value
-    let rutas = document.getElementById('rutas').value
-    if(!name || !descripcion || !codigo || !precio || !stock || !categoria || !rutas){
-        console.log(new Error("Faltan datos"))
-    }else{
-        let producto = {
-           title : name,
-           description : descripcion,
-           code : codigo,
-           price : precio,
-           status : true,
-           stock : stock,
-           category : categoria,
-           thumbnail : rutas
-        }
-        socket.emit("new-product",producto)
-        console.log("Productos agregado")
+    let category = document.getElementById('categoria').value
+    let thumbnail = document.getElementById('rutas').value
+    fetch("/agregarProducto",{
+      method : "POST",
+      headers : {
+          "Content-Type" : "application/json",
+      },
+      body : JSON.stringify({title,description,code,price,stock,category,thumbnail})
+  })
+    socket.emit("new-product",{title,description,code,price,stock,category,thumbnail})
     }
-})
+)
 
 function borrarProducto(e){
     let id = e.target.id

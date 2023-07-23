@@ -4,6 +4,8 @@ import router from "./Routes/view.router.js"
 import { Server } from "socket.io"
 import productos from "./productos.json" assert {type : "json"}
 import fs from "fs"
+import path from "path"
+import { __dirname } from "./utils.js"
 
 const app = express()
 const PORT = 8080
@@ -13,9 +15,9 @@ app.use(express.urlencoded({extended : true}))
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
-app.set('views', './views');
+app.set('views', path.join(__dirname, "./views"));
 
-app.use(express.static("../public"))
+app.use(express.static(path.join(__dirname , "../public")))
 
 app.use("/",router)
 
@@ -37,12 +39,18 @@ ioServer.on("connection", (socket) => {
     socket.on("disconnect",()=>{
         console.log("Usuario desconectado")
     })
-  
+
     socket.on("new-product", (data) => {
-      let id = productos.length + 1
-      data.id = id
-      productos.push(data)
-      fs.writeFileSync("productos.json",JSON.stringify(productos))
+      let title = data.title
+      let description = data.description
+      let code = data.code
+      let price = +data.price
+      let stock = +data.stock
+      let category = data.category
+      let thumbnail = data.thumbnail
+      console.log(title,description,code,price,stock,category,thumbnail)
+      console.log("Producto agregado correctamente")
+      socket.emit("nuevoProductoAgregado",data)
     });
 
     socket.on("delete-product",(data)=>{

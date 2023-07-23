@@ -24,33 +24,6 @@ router.get("/:pid",(req,res)=>{
     producto ? res.json({message : "Producto seleccionado", data : producto}) : res.status(404).json({message: "Producto no encontrado"})
 })
 
-router.post("/",(req,res)=>{
-    let id = productos.length +1
-    const {title,description,code,price,stock,category,thumbnail} = req.body
-    if(!title || !description || !code || !price || !stock || !category){
-        return res.status(500).json({message : "Faltan datos"})
-    }else{
-        let productoNuevo = {
-            id : id,
-            title : title,
-            description : description,
-            code : code,
-            price : price,
-            status : true,
-            stock : stock,
-            category : category,
-            thumbnail : thumbnail
-        }
-        let idRepetido = productos.find((producto)=>producto.id === productoNuevo.id)
-        if(idRepetido){
-            productoNuevo.id++
-        }
-        productos.push(productoNuevo)
-        fs.writeFileSync("productos.json",JSON.stringify(productos))
-        return res.json({message: "Producto agregado exitosamente", data : productoNuevo})
-    }
-})
-
 router.put("/:pid",(req,res)=>{
     const {pid} = req.params
     let producto = productos.find((producto)=>producto.id === +pid)
