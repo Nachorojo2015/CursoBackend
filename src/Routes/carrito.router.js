@@ -1,64 +1,45 @@
 import { Router } from "express";
-import fs from "fs"
-import productos from "../productos.json" assert {type : "json"}
+import CartsModel from "../dao/models/carts.js";
+import ProductsModel from "../dao/models/products.js";
 
 const router = Router()
-
-router.post("/",(req,res)=>{
-    if(!fs.existsSync("carrito.json")){
-        fs.writeFileSync("carrito.json",JSON.stringify([]))
-        return res.json({message: "Carrito creado"})
-    }else{
-      let arrayCarrito = fs.readFileSync("carrito.json","utf-8")
-      let carrito = JSON.parse(arrayCarrito)
-      let id = carrito.length + 1
-      carrito.push({id: id, products : []})
-      fs.writeFileSync("carrito.json",JSON.stringify(carrito))
-      return res.json({message: "Carrito creado", id:id, products : []})
+//Crear carrito
+router.post("/",async(req,res)=>{
+    const carrito = {
+      products : []
     }
+    let result = await CartsModel.insertMany([carrito])
+    return res.json({message : "Carrito creado correctamente", data: result})
 })
-
-router.get("/:cid",(req,res)=>{
-     const {cid} = req.params
-     let carritos = fs.readFileSync("carrito.json","utf-8")
-     let arrayCarritos = JSON.parse(carritos)
-     let carrito = arrayCarritos.find((carrito)=>carrito.id === +cid)
-     if(carrito){
-        let productos = carrito.products
-        res.json({message: "Estos son los productos del carrito", id: carrito.id, products : productos})
-     }else{
-        res.status(404).json({message: "Carrito no encontrado"})
-     }
+//Tomar carrito por id
+router.get("/:cid",async(req,res)=>{
+    const {cid} = req.params
+    let result = await CartsModel.findById(cid)
+    return res.json({message: "Carrito seleccionado", data: result})
 })
-
-router.post("/:cid/product/:pid",(req,res)=>{
+//Tomar carrito por id y sumarle un producto
+router.post("/:cid/product/:pid",async(req,res)=>{
   const {cid,pid} = req.params
-  let carritos = fs.readFileSync("carrito.json","utf-8")
-  let arrayCarritos = JSON.parse(carritos)
-  let carrito = arrayCarritos.find((carrito)=>carrito.id === +cid)
-  let carritoArray = carrito.products
+  let carrito = await CartsModel.findById(cid)
+  let producto = await ProductsModel.findById(pid)
   if(carrito){
-      let productoSeleccionado = productos.find((producto)=>producto.id === +pid)
-      if(productoSeleccionado){
-          if(carritoArray.some((productoCarrito)=>productoCarrito.product === productoSeleccionado.id)){
-             let productoCarrito = carritoArray.find((productoCarrito)=>productoCarrito.product === productoSeleccionado.id)
-             productoCarrito.quantity++
-             fs.writeFileSync("carrito.json",JSON.stringify(arrayCarritos))
-             return res.json({message : "Producto sumado correctamente", data: productoCarrito})
-          }else{
-             let productoCarrito = {
-                product : productoSeleccionado.id,
-                quantity : 1
-             }
-             carritoArray.push(productoCarrito)
-             fs.writeFileSync("carrito.json",JSON.stringify(arrayCarritos))
-             return res.json({message: "Producto agregado correctamente"})
-          }
-      }else{
-        return res.status(404).json({message: "Producto no encontrado"})
+    let productosEnCarrito = carrito.products
+    if(productosEnCarrito.some((productoEnCarrito)=>productoEnCarrito.product === producto.id)){
+       let producto = productosEnCarrito.find((producto)=>producto.product === pid)
+       producto.quantity++
+       let result = await CartsModel.findByIdAndUpdate(cid,carrito)
+       return res.json({message : "Producto sumado al carrito", data: result})
+    }else{
+      const productoCarrito = {
+         product : producto.id,
+         quantity : 1
       }
+      carrito.products.push(productoCarrito)
+      let result = await CartsModel.findByIdAndUpdate(cid,carrito)
+      return res.json({message: "Producto agregado al carrito", data: result})
+    }
   }else{
-    return res.status(404).json({message: "Carrito no encontrado"})
+   return res.status(404).json({message: "Carrito no encontrado"})
   }
 })
 

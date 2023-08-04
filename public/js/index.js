@@ -3,6 +3,7 @@ const socket = io()
 socket.emit("connection","nuevo cliente conectado")
 
 socket.on("update-products",(data)=>{
+  console.log(data)
     let container = document.getElementById('contenedor')
     container.innerHTML = ""
     data.forEach((producto)=>{
@@ -21,13 +22,13 @@ socket.on("update-products",(data)=>{
         <div class="card-body">
           <a href="#" class="card-link">${producto.status}</a>
           <a href="#" class="card-link">${producto.category}</a>
-          <button type="button" class="btn btn-danger" id='${producto.id}'>
+          <button type="button" class="btn btn-danger" id='${producto._id}'>
           Eliminar Producto
           </button>
         </div>
       </div>`
       container.append(newDiv)
-      let botonEliminar = document.getElementById(`${producto.id}`)
+      let botonEliminar = document.getElementById(`${producto._id}`)
       botonEliminar.addEventListener("click",borrarProducto)
     })
 })
@@ -43,7 +44,7 @@ formAgregar.addEventListener('submit',(e)=>{
     let stock = document.getElementById('stock').value
     let category = document.getElementById('categoria').value
     let thumbnail = document.getElementById('rutas').value
-    fetch("/agregarProducto",{
+    fetch("agregarProducto",{
       method : "POST",
       headers : {
           "Content-Type" : "application/json",
@@ -51,12 +52,14 @@ formAgregar.addEventListener('submit',(e)=>{
       body : JSON.stringify({title,description,code,price,stock,category,thumbnail})
   })
     socket.emit("new-product",{title,description,code,price,stock,category,thumbnail})
-    }
+    location.reload()
+  }
 )
 
 function borrarProducto(e){
     let id = e.target.id
-    socket.emit("delete-product",+id)
+    socket.emit("delete-product",id)
+    location.reload()
 }
 
 

@@ -1,44 +1,36 @@
 import { Router } from "express";
-import fs from "fs"
+import ProductsModel from "../dao/models/products.js";
 
 const router = Router()
 
-router.get("/",(req,res)=>{
-    let productos = JSON.parse(fs.readFileSync("productos.json","utf-8"))
+router.get("/",async (req,res)=>{
+    const productos = await ProductsModel.find({}).lean()
+    let arr = []
     res.render("home",{title: "Productos agregados", productos: productos})
 })
 
 router.get("/realTimeProducts",(req,res)=>{
-    res.render("realTimeProducts",{title: "Productos en tiempo real"})
+    res.render("realTimeProducts",{title: "Productos en tiempo real", script: "index.js"})
 })
 
-router.post("/agregarProducto",(req,res)=>{
-    let productos = JSON.parse(fs.readFileSync("productos.json","utf-8"))
-    let id = productos.length +1
+router.post("/agregarProducto",async(req,res)=>{
     const {title,description,code,price,stock,category,thumbnail} = req.body
-    if(!title || !description || !code || !price || !stock || !category){
+    if(!title || !description || !code || !price || !stock || !category || !thumbnail){
         return res.status(500).json({message : "Faltan datos"})
     }else{
-        let productoNuevo = {
-            id : id,
+        const productoNuevo = {
             title : title,
             description : description,
             code : code,
-            price : price,
+            price : +price,
             status : true,
-            stock : stock,
+            stock : +stock,
             category : category,
             thumbnail : thumbnail
         }
-        let idRepetido = productos.find((producto)=>producto.id === productoNuevo.id)
-        if(idRepetido){
-            productoNuevo.id++
-        }
-        productos.push(productoNuevo)
-        fs.writeFileSync("productos.json",JSON.stringify(productos))
-        return res.status(201).json({message: "Producto agregado exitosamente", data : productoNuevo})
+        let result = await ProductsModel.insertMany([productoNuevo])
+        return res.status(201).json({message: "Producto agregado exitosamente", data : result})
     }
 })
-
 
 export default router
