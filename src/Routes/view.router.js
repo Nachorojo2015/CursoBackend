@@ -5,7 +5,6 @@ const router = Router()
 
 router.get("/",async (req,res)=>{
     const productos = await ProductsModel.find({}).lean()
-    let arr = []
     res.render("home",{title: "Productos agregados", productos: productos})
 })
 
