@@ -19,7 +19,7 @@ router.post("/agregarProducto",async(req,res)=>{
     }else{
         const productoNuevo = {
             title : title,
-            description : description,
+            description : description, 
             code : code,
             price : +price,
             status : true,
