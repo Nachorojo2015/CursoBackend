@@ -5,18 +5,13 @@ const router = Router()
 
 //Tomar productos
 router.get("/",async(req,res)=>{
-    const {limit} = req.query
-    if(limit){
-        let results = await ProductsModel.find().limit(limit)
-        res.json({title: "Productos seleccionados", productos: results})
-    }else{
-        let results = await ProductsModel.find()
-        if(results.length === 0){
-            res.json({message:"No hay productos", data : results})
-        }else{
-            res.json({title: "Todos los productos" , productos : results})
-        }
-    }
+    const {limit = 10, page = 1, sort, query} = req.query
+    const results = await ProductsModel.paginate(query ? {category: query} : {},{limit, page, lean: true, sort: sort ? {price:1} : {price:-1}})
+    let prevLink = results.hasPrevPage ? `http://localhost:8080/productos/?page=${+page-1}&limit=${limit}&query=${query}&sort=${sort}` : null
+    let nextLink = results.hasNextPage ? `http://localhost:8080/productos/?page=${+page+1}&limit=${limit}&query=${query}&sort=${sort}` : null
+    results.prevLink = prevLink
+    results.nextLink = nextLink
+    res.send(results)
 })
 //Tomar producto por id
 router.get("/:pid",async(req,res)=>{

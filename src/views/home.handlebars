@@ -15,7 +15,14 @@
   <div class="card-body">
     <a href="#" class="card-link">{{this.status}}</a>
     <a href="#" class="card-link">{{this.category}}</a>
+    <button class="btn btn-success" id="{{this._id}}">Agregar al Carrito</button>
   </div>
 </div>
     {{/each}}
 </div>
+{{#if hasPrevPage}}
+ <a href="/?limit={{limit}}&page={{prevPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Anterior</button></a>
+{{/if}}
+{{#if hasNextPage}}
+ <a href="/?limit={{limit}}&page={{nextPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Siguiente</button></a>
+{{/if}}

@@ -23,8 +23,6 @@ const PORT = process.env.PORT || 8080
 const MONGO_URL = process.env.URL_MONGOOSE
 //Conectar con mongo
 const connection = mongoose.connect(MONGO_URL)
-    
-console.log(MONGO_URL)
 
 //Configuración del express
 app.use(express.json())
