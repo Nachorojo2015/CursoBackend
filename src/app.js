@@ -35,7 +35,7 @@ app.set('views', path.join(__dirname, "./views"));
 
 
 //Uso de la carpeta public para ver el contenido / comunicación cliente servidor
-app.use(express.static(path.join(__dirname , "../public")))
+app.use(express.static("../public"))
 
 //Rutas
 app.use("/productos",Productosrouter)

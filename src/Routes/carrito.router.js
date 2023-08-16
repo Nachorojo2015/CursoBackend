@@ -51,7 +51,7 @@ router.delete("/:cid/products/:pid",async(req,res)=>{
     if(producto !== -1){
       productos.splice(producto,1)
       let result = await CartsModel.findByIdAndUpdate(cid,carrito)
-      return res.json({message: "Producto eleminado correctamente del carrito", data: result})
+      return res.json({message: "Producto eliminado correctamente del carrito", data: result})
     }else{
       return res.status(404).json({message: "Producto no encontrado"})
     }

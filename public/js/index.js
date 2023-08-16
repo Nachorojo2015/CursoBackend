@@ -44,7 +44,7 @@ formAgregar.addEventListener('submit',(e)=>{
     let stock = document.getElementById('stock').value
     let category = document.getElementById('categoria').value
     let thumbnail = document.getElementById('rutas').value
-    fetch("agregarProducto",{
+    fetch("productos/agregarProducto",{
       method : "POST",
       headers : {
           "Content-Type" : "application/json",
