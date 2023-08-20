@@ -1,7 +1,6 @@
 import { Router } from "express";
 import ProductsModel from "../dao/models/products.js";
 import CartsModel from "../dao/models/carts.js";
-import mongoose from "mongoose";
 
 const router = Router()
 
@@ -17,7 +16,13 @@ router.get("/",async (req,res)=>{
     limit,
     sort,
     query,
-    script: "agregarProductos.js"
+    script: "home.js", 
+    style: "home.css",
+    nombre: req.session.name,
+    apellido: req.session.last_name,
+    user: req.session.user,
+    mail: req.session.mail,
+    rol: req.session.rol
 })
 })
 
@@ -34,7 +39,7 @@ router.get("/carts/:cid",async(req,res)=>{
             if(productos.length === 0){
                 res.send("El carrito está vacio")
             }else{
-                res.render("carrito", { title: "Carrito", productos});
+                res.render("carrito", { title: "Carrito", productos, script: "carrito.js", style: "carrito.css"});
             }
         } else {
             res.send("Carrito no encontrado");

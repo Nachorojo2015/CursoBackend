@@ -12,6 +12,9 @@ import Productosrouter from "./Routes/productos.router.js"
 import Carritorouter from "./Routes/carrito.router.js"
 import Chatrouter from "./Routes/chat.router.js"
 import MessagesModel from "./dao/models/messages.js"
+import sessionRouter from "./Routes/session.router.js"
+import session from "express-session"
+import MongoStore from "connect-mongo"
 //Configuración del dotenv
 dotenv.config()
 
@@ -23,6 +26,21 @@ const PORT = process.env.PORT || 8080
 const MONGO_URL = process.env.URL_MONGOOSE
 //Conectar con mongo
 const connection = mongoose.connect(MONGO_URL)
+
+//Sesión con mongo
+app.use(session({
+    store : MongoStore.create({
+        mongoUrl: process.env.URL_MONGOOSE,
+        mongoOptions: {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        },
+        ttl: 100
+    }),
+    secret: "coderSecret",
+    resave: false,
+    saveUninitialized: false
+}))
 
 //Configuración del express
 app.use(express.json())
@@ -37,11 +55,21 @@ app.set('views', path.join(__dirname, "./views"));
 //Uso de la carpeta public para ver el contenido / comunicación cliente servidor
 app.use(express.static("../public"))
 
+//Función de autenticación
+function auth(req,res,next){
+    if(req.session.rol){
+        return next()
+    }else{
+        res.send("Error")
+    }
+}
+
 //Rutas
 app.use("/productos",Productosrouter)
 app.use("/carrito",Carritorouter)
-app.use("/",Viewrouter)
-app.use("/chat",Chatrouter)
+app.use("/views",auth,Viewrouter)
+app.use("/chat",auth,Chatrouter)
+app.use("/",sessionRouter)
 
 
 

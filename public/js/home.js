@@ -1,6 +1,7 @@
 let carrito = prompt("Ingrese el id de su carrito")
 
 let buttons = document.querySelectorAll("button")
+let botonCerrarSesion = document.getElementById("cerrarSesion")
 
 buttons.forEach((button)=>{
     button.addEventListener('click',(agregarAlCarrito))
@@ -25,4 +26,14 @@ function agregarAlCarrito(e){
     console.log('Error:', error);
  });
 }
+
+botonCerrarSesion.addEventListener("click",async(e)=>{
+   e.preventDefault()
+   let response = await fetch("/logout")
+   let data = await response.json()
+   setTimeout(()=>{
+      window.location.href = "http://localhost:8080"
+   },2000)
+   console.log(data)
+})
 

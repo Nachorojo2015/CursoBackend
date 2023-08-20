@@ -26,12 +26,15 @@ router.post("/:cid/product/:pid",async(req,res)=>{
       const productoEnCarrito = carrito.products.find(producto => producto.product.id === pid);
       
       if (productoEnCarrito) {
-          productoEnCarrito.quantity++;
+          let producto = await ProductsModel.findById(pid)
+          producto.quantity++
+          let result = await ProductsModel.findByIdAndUpdate(pid,producto)
       } else {
           const producto = await ProductsModel.findById(pid);
+          producto.quantity = 1
+          let result = await ProductsModel.findByIdAndUpdate(pid,producto)
           carrito.products.push({
               product: producto._id,
-              quantity: 1
           });
       }
       

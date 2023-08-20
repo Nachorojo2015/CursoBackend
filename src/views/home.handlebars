@@ -1,5 +1,10 @@
-<h1>Productos</h1>
-<div style="display: flex;">
+<h1 class="title-home">Productos</h1>
+<a href="" id="cerrarSesion">Cerrar Sesion</a>
+<p>Bienvenido {{nombre}} {{apellido}}</p>
+<p>Usuario: {{user}}</p>
+<p>Mail: {{mail}}</p>
+<p>Rol: {{rol}}</p>
+<div class="container-products">
     {{#each productos}}
  <div class="card" style="width: 18rem;">
   <img src="{{this.thumbnail}}" className="card-img-top" alt="{{this.title}}">

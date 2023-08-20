@@ -64,7 +64,8 @@ router.post("/agregarProducto",async(req,res)=>{
             status : true,
             stock : +stock,
             category : category,
-            thumbnail : thumbnail
+            thumbnail : thumbnail,
+            quantity : 1
         }
         let result = await ProductsModel.insertMany([productoNuevo])
         return res.status(201).json({message: "Producto agregado exitosamente", data : result})
