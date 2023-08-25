@@ -1,75 +1,54 @@
 import { Router } from "express";
 import { UserModel } from "../dao/models/users.model.js";
+import { createHash, isValidPassword } from "../utils.js";
+import passport from "passport";
 
 const router = Router()
-
+//Vista del formulario de registro
 router.get("/session/signup",(req,res)=>{
     res.render("signup",{title: "Registrarse", style: "signup.css", script: "signup.js"})
 })
-
+//Vista del formulario de login
 router.get("/",(req,res)=>{
     res.render("login",{title: "Login", style: "login.css", script: "login.js"})
 })
 
-router.post("/signup",async(req,res)=>{
-    const {name,last_name,mail,user,password} = req.body
-    const result = await UserModel.create({
-        name,
-        last_name,
-        mail,
-        user,
-        password
-    })
-    if(result){
-        return res.json({
-            status: "Ok",
-            message: "Registrado con exito"
-        })
-    }else{
-        return res.json({
-            status: "Error",
-            messgae: "Hubo un error"
-        })
-    }
+//Registro con passport
+router.post("/register",passport.authenticate("register",{
+    failureRedirect: "/failRegister"}),async(req,res)=>{
+        return res.json({status: "success", message: "Usuario registrado"})
 })
 
-router.post("/login",async(req,res)=>{
-    const {mail,password} = req.body
-    const user = await UserModel.findOne({mail: mail, password: password})
-    console.log(user)
-    if(mail === "adminCoder@coder.com" && password === "adminCod3r123"){
-        req.session.name = "Admin"
-        req.session.last_name = "Coder"
-        req.session.user = "AdminCoder"
-        req.session.mail = "adminCoder@coder.com"
-        req.session.password = "adminCod3r123"
-        req.session.rol = "admin"
-        return res.json({
-            status: "Ok",
-            message: "Es Admin"
-        })
-    }else{
-        if(user){
-        req.session.name = user.name
-        req.session.last_name = user.last_name
-        req.session.user = user.user
-        req.session.mail = user.mail
-        req.session.password = user.password
-        req.session.rol = "user"
+//Ruta por si falla el registro
+router.get("/failRegister",(req,res)=>{
+    res.send({error:"Error register"})
+})
+
+//Login con passport   
+router.post("/login",passport.authenticate("login",{
+    failureRedirect: "/failLogin"}),async(req,res)=>{
+        if(!req.user){
+            return res.status(401).json({status: "Error", message: "Error de autenticación"})
+        }else{
+            req.session.name = req.user.name
+            req.session.last_name = req.user.last_name
+            req.session.user = req.user.user
+            req.session.email = req.user.email
+            req.session.password = req.user.password
+            req.session.rol = "user"
             return res.json({
                 status: "OK",
-                message: "Inicio exitoso"
-            })
-        }else{
-            req.session.rol = false
-            return res.json({
-                status: "Error", 
-                message: "Error de inicio de sesión"
+                message: "Logueado con exito"
             })
         }
-    }
+    })
+
+//Ruta si falla el login
+router.get("/failLogin",(req,res)=>{
+    res.send({error: "Error login"})
 })
 
+//Cerrar sesión
 router.get("/logout",(req,res)=>{
     req.session.destroy(err=>{
         if(!err){
@@ -84,5 +63,14 @@ router.get("/logout",(req,res)=>{
     })
 })
 
+//Registro con github
+router.get("/github",passport.authenticate("github",{scope:["user:email"]}),async(req,res)=>{})
+
+router.get("/githubcallback",passport.authenticate("github",{failureRedirect: "/"}),async(req,res)=>{
+    req.session.user = req.user
+    console.log(req.user)
+    req.session.rol = "user"
+    res.redirect("/views")
+})
 
 export default router

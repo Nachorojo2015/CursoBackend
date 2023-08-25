@@ -15,6 +15,8 @@ import MessagesModel from "./dao/models/messages.js"
 import sessionRouter from "./Routes/session.router.js"
 import session from "express-session"
 import MongoStore from "connect-mongo"
+import passport from "passport"
+import intializePassport from "./config/passport.config.js"
 //Configuración del dotenv
 dotenv.config()
 
@@ -41,6 +43,11 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }))
+
+//Passport
+intializePassport()
+app.use(passport.initialize())
+app.use(passport.session()) 
 
 //Configuración del express
 app.use(express.json())

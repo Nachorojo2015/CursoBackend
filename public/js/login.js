@@ -2,19 +2,18 @@ let form = document.getElementById("loginForm")
 
 form.addEventListener("submit",(e)=>{
     e.preventDefault()
-    let mail = document.getElementById("mail").value
+    let email = document.getElementById("mail").value
     let password = document.getElementById("password").value
-    console.log(mail,password)
-    login(mail,password)
+    login(email,password)
 })
 
-const login = async (mail,password)=>{
+const login = async (email,password)=>{
     const response = await fetch("/login",{
         method: "POST",
         headers:{
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({mail,password})
+        body: JSON.stringify({email,password})
     })
     const data = await response.json()
     console.log(data)

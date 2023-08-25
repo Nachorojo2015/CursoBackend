@@ -21,7 +21,7 @@ router.get("/",async (req,res)=>{
     nombre: req.session.name,
     apellido: req.session.last_name,
     user: req.session.user,
-    mail: req.session.mail,
+    email: req.session.email,
     rol: req.session.rol
 })
 })
