@@ -63,11 +63,13 @@ const intializePassport = async()=>{
     },async(accessToken,refreshToken,profile,done)=>{
           try{
             console.log(profile)
-           const user = await UserModel.findOne({email: profile?.email?.value})
+           const user = await UserModel.findOne({email: profile.login+"@gmail.com"})
            if(!user){ 
             const newUser = {
-                name: profile.displayName,
-                email: profile?.email?.value,
+                name: profile.name,
+                last_name: profile.displayName,
+                email: profile.login+"@gmail.com",
+                user: profile.username,
                 password: crypto.randomUUID()
             }
             const result = await UserModel.create(newUser)
