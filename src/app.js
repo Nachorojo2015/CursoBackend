@@ -5,7 +5,7 @@ import Viewrouter from "./Routes/view.router.js"
 import { Server } from "socket.io"
 import ProductsModel from "./dao/models/products.js"
 import path from "path"
-import { __dirname } from "./utils.js"
+import { __dirname, authToken } from "./utils.js"
 import * as dotenv from "dotenv"
 import mongoose from "mongoose"
 import Productosrouter from "./Routes/productos.router.js"
@@ -17,6 +17,7 @@ import session from "express-session"
 import MongoStore from "connect-mongo"
 import passport from "passport"
 import intializePassport from "./config/passport.config.js"
+import cookieParser from "cookie-parser"
 //Configuración del dotenv
 dotenv.config()
 
@@ -28,6 +29,9 @@ const PORT = process.env.PORT || 8080
 const MONGO_URL = process.env.URL_MONGOOSE
 //Conectar con mongo
 const connection = mongoose.connect(MONGO_URL)
+
+//Cookie
+app.use(cookieParser("C0D3RS3CR3T"))
 
 //Sesión con mongo
 app.use(session({
@@ -62,20 +66,20 @@ app.set('views', path.join(__dirname, "./views"));
 //Uso de la carpeta public para ver el contenido / comunicación cliente servidor
 app.use(express.static("../public"))
 
-//Función de autenticación
-function auth(req,res,next){
-    if(req.session.rol){
-        return next()
-    }else{
-        res.send("Error")
-    }
-}
+// Función de autenticación
+// function auth(req,res,next){
+//     if(req.user.role){
+//         return next()
+//     }else{
+//         res.send("Error")
+//     }
+// }
 
 //Rutas
 app.use("/productos",Productosrouter)
 app.use("/carrito",Carritorouter)
-app.use("/views",auth,Viewrouter)
-app.use("/chat",auth,Chatrouter)
+app.use("/views",authToken,Viewrouter)
+app.use("/chat",authToken,Chatrouter)
 app.use("/",sessionRouter)
 
 

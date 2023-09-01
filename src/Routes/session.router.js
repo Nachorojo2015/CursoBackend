@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { UserModel } from "../dao/models/users.model.js";
-import { createHash, isValidPassword } from "../utils.js";
+import {isValidPassword } from "../utils.js";
 import passport from "passport";
+import { generateToken, passportCall, authorization } from "../utils.js";
+import { UserModel } from "../dao/models/users.model.js";
 
 const router = Router()
 //Vista del formulario de registro
@@ -24,24 +25,29 @@ router.get("/failRegister",(req,res)=>{
     res.send({error:"Error register"})
 })
 
-//Login con passport   
-router.post("/login",passport.authenticate("login",{
-    failureRedirect: "/failLogin"}),async(req,res)=>{
-        if(!req.user){
-            return res.status(401).json({status: "Error", message: "Error de autenticación"})
+//Login con jwt   
+router.post("/login",async(req,res)=>{
+    const {email,password} = req.body
+    const user = await UserModel.findOne({email: email})
+    if(!user){
+        return res.json({status: "error", message: "User not found"})
+    }else{
+        if(!isValidPassword(password,user.password)){
+            return res.json({status: "error", message: "Invalid password"})
         }else{
-            req.session.name = req.user.name
-            req.session.last_name = req.user.last_name
-            req.session.user = req.user.user
-            req.session.email = req.user.email
-            req.session.password = req.user.password
-            req.session.rol = "user"
-            return res.json({
-                status: "OK",
-                message: "Logueado con exito"
+            const myToken = generateToken(user)
+            res.cookie("coderCookieToken",myToken,{ 
+               maxAge: 60 * 60 * 1000,
+               httpOnly: true
             })
+            return res.json({status: "success"}) 
         }
-    })
+    }
+})
+
+router.get("/current",passportCall("jwt"),authorization("user"),(req,res)=>{
+    res.send(req.user)
+})
 
 //Ruta si falla el login
 router.get("/failLogin",(req,res)=>{

@@ -1,14 +1,17 @@
 import passport from "passport";
 import local from "passport-local"
 import { UserModel } from "../dao/models/users.model.js";
-import { createHash, isValidPassword } from "../utils.js";
+import { createHash } from "../utils.js";
 import GithubStrategy from "passport-github2"
 import * as dotenv from "dotenv"
 import crypto from "crypto"
+import CartsModel from "../dao/models/carts.js"
+import jwt, {ExtractJwt} from "passport-jwt"
 
 dotenv.config()
 
 const LocalStrategy = local.Strategy
+const JwtStrategy = jwt.Strategy
 const GithubClientId = process.env.GITHUB_CLIENT_ID
 const GithubClientSecret = process.env.GITHUB_CLIENT_SECRET
 const GithubURL = process.env.GITHUB_URL_CALLBACK
@@ -17,20 +20,27 @@ const intializePassport = async()=>{
     passport.use("register",new LocalStrategy({
         passReqToCallback: true,
         usernameField: "email"},async(req,mail,pass,done)=>{
-            const {name,last_name,email,user,password} = req.body
+            const {first_name,last_name,email,age,password} = req.body
             try{
                 const userAccount = await UserModel.findOne({email: email})
                 if(userAccount){
                     return done(null,false,{message: "Tu usuario ya existe"})
                 }else{
-                    const newUser = {
-                        name,
+                    const carrito = {
+                        products : []
+                    }
+                    let cart = await CartsModel.create(carrito)
+                    const newUser = { 
+                        first_name,
                         last_name,
                         email,
-                        user,
+                        age,
+                        cart: cart.id,
+                        role: "user",
                         password: createHash(password)
                     }
                     const result = await UserModel.create(newUser)
+                    console.log(result)
                     return done(null,result)
                 }
             }catch(err){
@@ -38,23 +48,16 @@ const intializePassport = async()=>{
             }
         }))
 
-    passport.use("login",new LocalStrategy({
-        usernameField: "email"},async(email,password,done)=>{
-            try{
-                const user = await UserModel.findOne({email: email})
-                if(!user){
-                    return done(null,false,{message: "Tu usuario no existe"})
-                }else{
-                    if(!isValidPassword(password,user.password)){
-                        return done(null,false,{message: "Contraseña incorrecta"})
-                    }else{
-                        return done(null,user)
-                    }
-                }
-            }catch(err){
-                return done(err)
-            }
-        }))
+    passport.use("jwt", new JwtStrategy({
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+        secretOrKey: "CoderKeySecreta"
+    },async(jwt_payload,done)=>{
+        try{
+            return done(null,jwt_payload)
+        }catch(err){
+            return done(err)
+        }
+    }))
 
     passport.use("github",new GithubStrategy({
         clientID : GithubClientId,
@@ -90,6 +93,14 @@ const intializePassport = async()=>{
         let user = await UserModel.findById(id)
         done(null, user) 
     })
+}
+
+const cookieExtractor = (req)=>{
+    let token = null
+    if(req && req.cookies){
+        token = req.cookies["coderCookieToken"]
+    }
+    return token
 }
 
 export default intializePassport

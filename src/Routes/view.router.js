@@ -18,11 +18,10 @@ router.get("/",async (req,res)=>{
     query,
     script: "home.js", 
     style: "home.css",
-    nombre: req.session.name,
-    apellido: req.session.last_name,
-    user: req.session.user,
-    email: req.session.email,
-    rol: req.session.rol
+    nombre: req.user.user.first_name,
+    apellido: req.user.user.last_name,
+    email: req.user.user.email,
+    rol: req.user.user.role
 })
 })
 

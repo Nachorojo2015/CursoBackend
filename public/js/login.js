@@ -17,11 +17,15 @@ const login = async (email,password)=>{
     })
     const data = await response.json()
     console.log(data)
-    if(data.status === "OK"){
+    if(data.status === "success"){
         setTimeout(()=>{
             window.location.href = "http://localhost:8080/views"
          },2000)
     }else{
-        alert("Usuario no válido")
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+          })
     }
 }
