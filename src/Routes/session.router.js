@@ -73,14 +73,6 @@ router.get("/logout",(req,res)=>{
 router.get("/github",passport.authenticate("github",{scope:["user:email"]}),async(req,res)=>{})
 
 router.get("/githubcallback",passport.authenticate("github",{failureRedirect: "/"}),async(req,res)=>{
-    req.session.name = req.user.name
-    req.session.last_name = req.user.last_name
-    req.session.user = req.user.user
-    req.session.email = req.user.email
-    req.session.password = req.user.password
-    req.session.rol = "user"
-    console.log(req.user)
-    req.session.rol = "user"
     res.redirect("/views")
 })
 
