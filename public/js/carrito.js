@@ -8,6 +8,7 @@ let botonesEliminar = document.querySelectorAll("button")
       const currentURL = window.location.href;
       const parts = currentURL.split('/');
       const idCarrito = parts[parts.length - 1];
+      console.log(idProducto)
       try {
         // Realiza una solicitud de eliminación al servidor usando Fetch API
         const response = await fetch(`/carrito/${idCarrito}/products/${idProducto}`, {

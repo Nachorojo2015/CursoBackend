@@ -1,4 +1,4 @@
-let carrito = prompt("Ingrese el id de su carrito")
+let carrito = document.getElementById("id-carrito").href.split("/")[5]
 
 let buttons = document.querySelectorAll("button")
 let botonCerrarSesion = document.getElementById("cerrarSesion")

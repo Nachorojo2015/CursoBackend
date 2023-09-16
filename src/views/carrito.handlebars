@@ -13,13 +13,13 @@
     <tbody>
         {{#each productos}}
         <tr>
-            <td><img src="{{this.product.thumbnail}}" alt="{{this.product.title}}"  class="product-image"></td>
-            <td>{{this.product.title}}</td>
-            <td>{{this.product.code}}</td>
-            <td>{{this.product.category}}</td>
-            <td>{{this.product.quantity}}</td>
-            <td>${{this.product.price}}</td>
-            <td><button class="btn btn-danger" id="{{this.product._id}}">Eliminar</button></td>
+            <td><img src="{{this.thumbnail}}" alt="{{this.title}}"  class="product-image"></td>
+            <td>{{this.title}}</td>
+            <td>{{this.code}}</td>
+            <td>{{this.category}}</td>
+            <td>{{this.quantity}}</td>
+            <td>${{this.price}}</td>
+            <td><button class="btn btn-danger" id="{{this._id}}">Eliminar</button></td>
         </tr>
         {{/each}}
     </tbody>

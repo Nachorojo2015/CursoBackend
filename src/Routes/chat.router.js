@@ -1,9 +1,8 @@
 import { Router } from "express";
+import { getMessages } from "../Controller/chat.controller.js";
 
 const router = Router()
 
-router.get("/",(req,res)=>{
-    res.render("chat",{title:"Chat", script: "chat.js", style: "chat.css"})
-})
+router.get("/",getMessages)
 
 export default router

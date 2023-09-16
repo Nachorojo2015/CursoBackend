@@ -1,11 +1,11 @@
 import passport from "passport";
 import local from "passport-local"
-import { UserModel } from "../dao/models/users.model.js";
+import { UserModel } from "../dao/mongo/models/users.model.js";
 import { createHash } from "../utils.js";
 import GithubStrategy from "passport-github2"
 import * as dotenv from "dotenv"
 import crypto from "crypto"
-import CartsModel from "../dao/models/carts.js"
+import CartsModel from "../dao/mongo/models/carts.js"
 import jwt, {ExtractJwt} from "passport-jwt"
 
 dotenv.config()

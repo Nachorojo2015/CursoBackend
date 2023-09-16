@@ -2,7 +2,7 @@ import { Router } from "express";
 import {isValidPassword } from "../utils.js";
 import passport from "passport";
 import { generateToken, passportCall, authorization } from "../utils.js";
-import { UserModel } from "../dao/models/users.model.js";
+import { UserModel } from "../dao/mongo/models/users.model.js";
 
 const router = Router()
 //Vista del formulario de registro
@@ -17,7 +17,7 @@ router.get("/",(req,res)=>{
 //Registro con passport
 router.post("/register",passport.authenticate("register",{
     failureRedirect: "/failRegister"}),async(req,res)=>{
-        return res.json({status: "success", message: "Usuario registrado"})
+        res.json({status: "success", message: "Usuario registrado"})
 })
 
 //Ruta por si falla el registro

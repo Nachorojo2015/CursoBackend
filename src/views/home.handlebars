@@ -3,6 +3,9 @@
 <p>Bienvenido {{nombre}} {{apellido}}</p>
 <p>Mail: {{email}}</p>
 <p>Rol: {{rol}}</p>
+<a href="http://localhost:8080/views/carts/{{idCart}}" id="id-carrito"><span class="material-symbols-outlined">
+shopping_cart
+</span></a>
 <div class="container-products">
     {{#each productos}}
  <div class="card" style="width: 18rem;">
@@ -25,8 +28,8 @@
     {{/each}}
 </div>
 {{#if hasPrevPage}}
- <a href="/?limit={{limit}}&page={{prevPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Anterior</button></a>
+ <a href="/views?limit={{limit}}&page={{prevPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Anterior</button></a>
 {{/if}}
 {{#if hasNextPage}}
- <a href="/?limit={{limit}}&page={{nextPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Siguiente</button></a>
+ <a href="/views?limit={{limit}}&page={{nextPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Siguiente</button></a>
 {{/if}}
