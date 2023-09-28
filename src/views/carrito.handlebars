@@ -1,4 +1,4 @@
-<h1>Carrito</h1>
+<h1 id="{{purchaser}}" class="{{idC}}">Carrito</h1>
 <table style="width: 100%;">
     <thead>
         <tr>
@@ -19,9 +19,12 @@
             <td>{{this.category}}</td>
             <td>{{this.quantity}}</td>
             <td>${{this.price}}</td>
-            <td><button class="btn btn-danger" id="{{this._id}}">Eliminar</button></td>
+            <td><button class="products" id="{{this._id}}">Eliminar</button></td>
         </tr>
         {{/each}}
     </tbody>
-</table>
+</table> 
+<form id="comprar">
 <button class="btn btn-warning" id="vaciar">Vaciar Carrito</button>
+<button class="btn btn-success" type="submit">Comprar</button>
+</form>

@@ -3,7 +3,6 @@ const socket = io()
 socket.emit("connection","nuevo cliente conectado")
 
 socket.on("update-products",(data)=>{
-  console.log(data)
     let container = document.getElementById('contenedor')
     container.innerHTML = ""
     data.forEach((producto)=>{
@@ -44,22 +43,13 @@ formAgregar.addEventListener('submit',(e)=>{
     let stock = document.getElementById('stock').value
     let category = document.getElementById('categoria').value
     let thumbnail = document.getElementById('rutas').value
-    fetch("/productos/agregarProducto",{
-      method : "POST",
-      headers : {
-          "Content-Type" : "application/json",
-      },
-      body : JSON.stringify({title,description,code,price,stock,category,thumbnail})
-  })
-    socket.emit("new-product",{title,description,code,price,stock,category,thumbnail})
-    location.reload()
+    socket.emit("new-product",{title,description,code,price,stock,category,thumbnail,status: true, quantity: 1})
   }
 )
 
 function borrarProducto(e){
     let id = e.target.id
     socket.emit("delete-product",id)
-    location.reload()
 }
 
 

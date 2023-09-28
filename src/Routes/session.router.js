@@ -1,61 +1,65 @@
 import { Router } from "express";
-import {isValidPassword } from "../utils.js";
+import { isValidPassword } from "../utils.js";
 import passport from "passport";
 import { generateToken, passportCall, authorization } from "../utils.js";
-import { UserModel } from "../dao/mongo/models/users.model.js";
+import { UsersRepository } from "../dao/repository/users.repository.js";
+import { USER_DAO } from "../dao/index.js";
 
-const router = Router()
+const userService = new UsersRepository(USER_DAO)
+
+const sessionRouter = Router()
+
 //Vista del formulario de registro
-router.get("/session/signup",(req,res)=>{
-    res.render("signup",{title: "Registrarse", style: "signup.css", script: "signup.js"})
+sessionRouter.get("/session/signup",(req,res)=>{
+    res.render("signup",{title: "Registrarse", style: "signup.css", script: "signup.js", PORT: process.env.PORT})
 })
 //Vista del formulario de login
-router.get("/",(req,res)=>{
-    res.render("login",{title: "Login", style: "login.css", script: "login.js"})
+sessionRouter.get("/",(req,res)=>{
+    res.render("login",{title: "Login", style: "login.css", script: "login.js", PORT: process.env.PORT})
 })
 
 //Registro con passport
-router.post("/register",passport.authenticate("register",{
+sessionRouter.post("/register",passport.authenticate("register",{
     failureRedirect: "/failRegister"}),async(req,res)=>{
         res.json({status: "success", message: "Usuario registrado"})
 })
 
 //Ruta por si falla el registro
-router.get("/failRegister",(req,res)=>{
+sessionRouter.get("/failRegister",(req,res)=>{
     res.send({error:"Error register"})
 })
 
 //Login con jwt   
-router.post("/login",async(req,res)=>{
+sessionRouter.post("/login",async(req,res)=>{
     const {email,password} = req.body
-    const user = await UserModel.findOne({email: email})
+    const user = await userService.getUserByEmail(email)
     if(!user){
-        return res.json({status: "error", message: "User not found"})
+       return res.json({status: "error", message: "User not found"})
     }else{
         if(!isValidPassword(password,user.password)){
-            return res.json({status: "error", message: "Invalid password"})
+           return res.json({status: "error", message: "Invalid password"})
         }else{
             const myToken = generateToken(user)
             res.cookie("coderCookieToken",myToken,{ 
                maxAge: 60 * 60 * 1000,
                httpOnly: true
             })
-            return res.json({status: "success"}) 
+             res.json({status: "success"})  
         }
     }
 })
 
-router.get("/current",passportCall("jwt"),authorization("user"),(req,res)=>{
-    res.send(req.user)
+sessionRouter.get("/current",passportCall("jwt"),authorization("user"),(req,res)=>{
+    res.send({fullname: req.user.user.fullname, age: req.user.user.age, role: req.user.user.role}) 
 })
 
 //Ruta si falla el login
-router.get("/failLogin",(req,res)=>{
+sessionRouter.get("/failLogin",(req,res)=>{
     res.send({error: "Error login"})
 })
 
 //Cerrar sesión
-router.get("/logout",(req,res)=>{
+sessionRouter.get("/logout",(req,res)=>{
     req.session.destroy(err=>{
         if(!err){
            return res.json({
@@ -70,10 +74,10 @@ router.get("/logout",(req,res)=>{
 })
 
 //Registro con github
-router.get("/github",passport.authenticate("github",{scope:["user:email"]}),async(req,res)=>{})
+sessionRouter.get("/github",passport.authenticate("github",{scope:["user:email"]}),async(req,res)=>{})
 
-router.get("/githubcallback",passport.authenticate("github",{failureRedirect: "/"}),async(req,res)=>{
+sessionRouter.get("/githubcallback",passport.authenticate("github",{failureRedirect: "/"}),async(req,res)=>{
     res.redirect("/views")
 })
 
-export default router
+export {sessionRouter}

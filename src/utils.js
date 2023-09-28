@@ -7,7 +7,6 @@ import passport from "passport";
 export const createHash = password => bcrypt.hashSync(password,bcrypt.genSaltSync(10))
 
 export const isValidPassword = (savedPassword,password) =>{
-    console.log("Saved password: " + savedPassword, "Password: " + password)
     return bcrypt.compareSync(savedPassword,password)
 }
 
@@ -27,13 +26,18 @@ export const authToken = (req,res,next)=>{
 
     const token = auth
 
-    jwt.verify(token,privateKey,(err,user)=>{
+    jwt.verify(token,privateKey,(err,user)=>{ 
         if(err) res.json({status: "error", message: "Invalid Token"})
         req.user = user
         next()
     })
 }
 
+export const authAdmin = (req,res,next)=>{
+    if(req.user.user.role !== "user") return res.send({status: "error", message: "Is not admin"})
+    next()
+}
+ 
 export const passportCall = (strategy)=>{
     return async(req,res,next)=>{
         passport.authenticate(strategy,(error,user,info)=>{

@@ -1,5 +1,7 @@
 let form = document.getElementById("loginForm")
 
+const loc = window.location.href.split(":")
+
 form.addEventListener("submit",(e)=>{
     e.preventDefault()
     let email = document.getElementById("mail").value
@@ -19,8 +21,8 @@ const login = async (email,password)=>{
     console.log(data)
     if(data.status === "success"){
         setTimeout(()=>{
-            window.location.href = "http://localhost:8080/views"
-         },2000)
+            window.location.href = loc[0]+":"+loc[1]+":"+loc[2].split("/")[0]+"/views"
+         },1000)
     }else{
         Swal.fire({
             icon: 'error',

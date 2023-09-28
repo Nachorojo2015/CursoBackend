@@ -1,66 +1,34 @@
 import { PRODUCTS_DAO } from "../dao/index.js";
+import { ProductsRepository } from "../dao/repository/products.repository.js";
 
-async function getProductos(req,res){
+const productsService = new ProductsRepository(PRODUCTS_DAO)
+
+async function getProducts(req,res){
     try{
-       const result = await PRODUCTS_DAO.getProducts(req,res)
-       res.send(result)
+       const products = await productsService.getProducts(req,res)
+       res.json({status: "Success", products})
     }catch(err){
         console.log(err)
     }
 }
 
-async function getProductByID(req,res){
+async function getProductById(req,res){
     try{
         const {pid} = req.params
-        const producto = await PRODUCTS_DAO.getProductById(pid)
-        res.json({message: "Producto seleccionado", producto : producto})
+        const product = await productsService.getProductById(pid)
+        res.json({status: "Success", product})
     }catch(err){
         console.log(err)
     }
 }
 
-async function modifyProducto(req,res){
-    try{
-    const {pid} = req.params
-    const {title,description,code,price,stock,category,thumbnail} = req.body
-    if(!title || !description || !code || !price || !stock || !category || !thumbnail){
-        return res.status(500).json({message : "Faltan datos"})
-    }else{
-        const producto = {
-         title : title,
-         description: description,
-         code : code,
-         price : +price,
-         status : true,
-         stock : +stock,
-         category : category,
-         thumbnail : thumbnail
-        }
-        const data = await PRODUCTS_DAO.modifyProduct(producto,pid)
-        res.json({message : "Producto modificado correctamente", data})
-    }
-    }catch(err){
-        console.log(err)
-    }
-}
-
-async function deleteProducto(req,res){
-    try{
-    const {pid} = req.params
-    const data = await PRODUCTS_DAO.deleteProduct(pid)
-    res.send(data)
-    }catch(err){
-        console.log(err)
-    }
-}
-
-async function saveProducto(req,res){
+async function saveProduct(req,res){
     try{
     const {title,description,code,price,stock,category,thumbnail} = req.body
     if(!title || !description || !code || !price || !stock || !category || !thumbnail){
         res.status(500).json({message : "Faltan datos"})
     }else{
-        const productoNuevo = {
+        const newProduct = {
             title,
             description,
             code,
@@ -71,13 +39,57 @@ async function saveProducto(req,res){
             thumbnail,
             quantity : 1
         }
-        console.log(productoNuevo)
-        const data = await PRODUCTS_DAO.saveProduct(productoNuevo)
-        res.status(201).json({message: "Producto agregado exitosamente", status: data})
+        const result = await productsService.saveProduct(newProduct)
+        res.status(201).json({status: "Success", result})
     }
     }catch(err){
         console.log(err)
     }
 }
 
-export { getProductos, getProductByID, modifyProducto, deleteProducto, saveProducto }
+async function modifyProduct(req,res){
+    try{
+    const {pid} = req.params
+    const {title,description,code,price,stock,category,thumbnail} = req.body
+    if(!title || !description || !code || !price || !stock || !category || !thumbnail){
+        return res.status(500).json({message : "Faltan datos"})
+    }else{
+        const updateProduct = {
+         title,
+         description,
+         code,
+         price : +price,
+         status : true,
+         stock : +stock,
+         category,
+         thumbnail
+        }
+        const result = await productsService.modifyProduct(pid,updateProduct)
+        res.status(201).json({status: "Success", result})
+    }
+    }catch(err){
+        console.log(err)
+    }
+}
+
+async function deleteProduct(req,res){
+    try{
+    const {pid} = req.params
+    const result = await productsService.deleteProduct(pid)
+    res.status(201).json({status: "Success", result})
+    }catch(err){
+        console.log(err)
+    }
+}
+
+async function modifyStockProduct(req,res){
+  const {pid} = req.params
+  try{
+    const response = await productsService.modifyStockProduct(pid)
+    res.json({status: "Success", response}) 
+  }catch(err){
+    console.log(err)
+  }
+}
+
+export { getProducts, getProductById, saveProduct, modifyProduct, deleteProduct, modifyStockProduct }

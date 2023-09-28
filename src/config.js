@@ -4,8 +4,8 @@ function configuration(){
     const command = new Command()
     command.option("--mode <mode>", "Modo de desarrollo", "prods") 
     command.parse()
-    let m = command.opts().mode
-    dotenv.config({path: m === "PRODUCTION" ? "./.env.sq" : "./.env"})
+    let mode = command.opts().mode
+    dotenv.config({path: mode === "PRODUCTION" ? "./.env.sq" : "./.env"})
 }
 
 export {configuration} 

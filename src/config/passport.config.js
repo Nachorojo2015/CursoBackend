@@ -1,14 +1,17 @@
 import passport from "passport";
 import local from "passport-local"
-import { UserModel } from "../dao/mongo/models/users.model.js";
 import { createHash } from "../utils.js";
 import GithubStrategy from "passport-github2"
-import * as dotenv from "dotenv"
 import crypto from "crypto"
-import CartsModel from "../dao/mongo/models/carts.js"
+import { CARTS_DAO } from "../dao/index.js";
 import jwt, {ExtractJwt} from "passport-jwt"
+import { configuration } from "../config.js";
+import { USER_DAO } from "../dao/index.js";
+import { UsersRepository } from "../dao/repository/users.repository.js";
 
-dotenv.config()
+const userService = new UsersRepository(USER_DAO)
+
+configuration()
 
 const LocalStrategy = local.Strategy
 const JwtStrategy = jwt.Strategy
@@ -22,25 +25,24 @@ const intializePassport = async()=>{
         usernameField: "email"},async(req,mail,pass,done)=>{
             const {first_name,last_name,email,age,password} = req.body
             try{
-                const userAccount = await UserModel.findOne({email: email})
+                const userAccount = await userService.getUserByEmail(email)
                 if(userAccount){
                     return done(null,false,{message: "Tu usuario ya existe"})
                 }else{
-                    const carrito = {
+                    const CART = {
                         products : []
                     }
-                    let cart = await CartsModel.create(carrito)
+                    let cart = await CARTS_DAO.saveCart(CART) 
                     const newUser = { 
                         first_name,
                         last_name,
                         email,
                         age,
                         cart: cart.id,
-                        role: "user",
+                        role: "user", 
                         password: createHash(password)
                     }
-                    const result = await UserModel.create(newUser)
-                    console.log(result)
+                    const result = await userService.createUser(newUser)
                     return done(null,result)
                 }
             }catch(err){
@@ -66,7 +68,7 @@ const intializePassport = async()=>{
     },async(accessToken,refreshToken,profile,done)=>{
           try{
             console.log(profile)
-           const user = await UserModel.findOne({email: profile?.emails[0]?.value})
+           const user = await userService.getUserByEmail(profile?.emails[0]?.value)
            if(!user){ 
             const newUser = {
                 name: profile.displayName,
@@ -75,7 +77,7 @@ const intializePassport = async()=>{
                 user: profile.username,
                 password: crypto.randomUUID()
             }
-            const result = await UserModel.create(newUser)
+            const result = await userService.createUser(newUser)
             done(null,result)
            }else{
             done(null,user)
@@ -90,7 +92,7 @@ const intializePassport = async()=>{
     })
     
     passport.deserializeUser(async (id, done) => {
-        let user = await UserModel.findById(id)
+        let user = await userService.getUserById(id)
         done(null, user) 
     })
 }
@@ -103,4 +105,4 @@ const cookieExtractor = (req)=>{
     return token
 }
 
-export default intializePassport
+export {intializePassport}

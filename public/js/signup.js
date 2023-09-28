@@ -1,4 +1,5 @@
 let form = document.getElementById("signupForm")
+const loc = window.location.href.split(":")
 
 form.addEventListener("submit",(e)=>{
     e.preventDefault()
@@ -29,7 +30,7 @@ const register = async (first_name,last_name,email,age,password)=>{
             timer: 1500
         })
         setTimeout(()=>{
-            window.location.href = "http://localhost:8080/"
+            window.location.href = loc[0]+":"+loc[1]+":"+loc[2].split("/")[0]
          },2000)
     }
     return data

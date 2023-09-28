@@ -1,42 +1,50 @@
-export default class ProductsDao{
+export class ProductsMemoryDao{
     constructor(){
         this.products = []
     }
 
-    getProducts(req,res){
+   async getProducts(req,res){
         return this.products
     }
 
-    getProductById(id){
-        return this.products.find(p=>p.id == id)
+   async getProductById(id){
+        return this.products.find(p=>p._id === +id)
     }
 
-    saveProduct(product){
+   async saveProduct(product){
         this.products.push(product)
         this.products.forEach(p=>{
-            p.id = this.products.indexOf(p)+1
+            p._id = this.products.indexOf(p)+1
         })
-        return "Product saved"
+        return product
     }
-
-    modifyProduct(product,id){
-        let indexProduct = this.products.findIndex(p=>p.id == id)
-        if(indexProduct == -1) return "Product not found"
+ 
+   async modifyProduct(id,product){
+        let indexProduct = this.products.findIndex(p=>p._id === +id)
+        const quantity = this.products[indexProduct].quantity
+        if(indexProduct === -1) return "Product not found"
+        product.quantity = quantity
         this.products[indexProduct] = product
-        return "Success"
+        return product
     }
 
-    deleteProduct(id){
-        let product = this.products.find((p) => p.id == id)
+   async deleteProduct(id){
+        let product = this.products.find((p) => p._id === +id)
         if(product){
             let indexProduct = this.products.indexOf(product)
             this.products.splice(indexProduct,1)
             this.products.forEach(p=>{
                 p.id = this.products.indexOf(p)+1
             })
-            return "Success"
+            return id
         }else{
             return "Product not found"
         }
     }
+
+   async modifyStockProduct(pid){
+        const product = this.products.find(product => product._id === pid)
+        product.stock -= product.quantity
+        return product
+   }
 }

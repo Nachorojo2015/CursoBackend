@@ -18,6 +18,4 @@ cartsSchema.pre("findOne",function(next){
     next()
 })
 
-const CartsModel = mongoose.model(cartsCollection,cartsSchema)
-
-export default CartsModel
+export const CARTS_MODEL = mongoose.model(cartsCollection,cartsSchema)

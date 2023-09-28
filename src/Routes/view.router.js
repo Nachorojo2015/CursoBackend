@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { showProducts, showRealTimeProducts, showCart } from "../Controller/views.controller.js"
+import { authAdmin } from "../utils.js";
 
-const router = Router()
+const viewsRouter = Router()
 
-router.get("/",showProducts)
+viewsRouter.get("/",showProducts)
 
-router.get("/realTimeProducts",showRealTimeProducts)
+viewsRouter.get("/realTimeProducts",authAdmin,showRealTimeProducts)
 
-router.get("/carts/:cid",showCart)
+viewsRouter.get("/carts/:cid",showCart) 
 
-export default router 
+export {viewsRouter} 

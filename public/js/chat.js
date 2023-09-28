@@ -66,7 +66,7 @@ socket.on("enviar-mensajes",(data)=>{
         let newDiv = document.createElement('div')
         newDiv.innerHTML =  ` 
         <div>
-        <p><b>${mensaje.user}</b></p>
+        <p><b>${mensaje.username}</b></p>
         <p>${mensaje.message}</p>
         </div>
         `
