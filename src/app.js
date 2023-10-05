@@ -21,10 +21,15 @@ import { PRODUCTS_DAO } from "./dao/index.js"
 import { ChatRepository } from "./dao/repository/chat.repository.js"
 import { MESSAGES_DAO } from "./dao/index.js"
 import { PRODUCTS_MODEL } from "./dao/mongo/models/products.js"
+import compression from "express-compression"
 //Configuración del dotenv
 configuration()
 //Inicializar express
 const app = express()
+//Compresión de archivos
+app.use(compression({
+    brotli: {enabled: true,zlib:{}}
+}))
 //Guardar el puerto
 const PORT = process.env.PORT
 //Guardar la direccion de la base de Mongo

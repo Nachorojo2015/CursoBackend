@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getProducts, getProductById, saveProduct, modifyProduct, deleteProduct, modifyStockProduct } from "../Controller/products.controller.js"
+import { getProducts, getProductById, saveProduct, modifyProduct, deleteProduct, modifyStockProduct, createProducts } from "../Controller/products.controller.js"
 
 const productsRouter = Router()
 
@@ -15,5 +15,7 @@ productsRouter.put("/:pid",modifyProduct)
 productsRouter.delete("/:pid",deleteProduct)
 //Modificar producto stock
 productsRouter.put("/stock/:pid", modifyStockProduct)
+//Crear productos
+productsRouter.post("/mockingproducts",createProducts)
 
 export {productsRouter}

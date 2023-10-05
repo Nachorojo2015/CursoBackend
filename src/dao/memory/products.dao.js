@@ -43,7 +43,7 @@ export class ProductsMemoryDao{
     }
 
    async modifyStockProduct(pid){
-        const product = this.products.find(product => product._id === pid)
+        const product = this.products.find(product => product._id === +pid)
         product.stock -= product.quantity
         return product
    }
