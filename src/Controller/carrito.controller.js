@@ -2,8 +2,10 @@ import { CARTS_DAO } from "../dao/index.js"
 import { TICKET_DAO } from "../dao/index.js"
 import { CustomErrors } from "../services/errors/customErrors.js";
 import { Errors } from "../services/errors/errors.js";
+import { LOGGER } from "../dao/index.js";
 
 async function createCart(req,res){
+      req.logger = LOGGER
       try{
         const cart = {
           products : []
@@ -17,12 +19,13 @@ async function createCart(req,res){
           cause: err,
           code: Errors.DATABASE_ERROR
       })
-      console.log(error)
+      req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
       res.json({status: "error", error})
       }
 }
 
 async function getCartById(req,res){
+    req.logger = LOGGER
     try{
     const {cid} = req.params 
     const result = await CARTS_DAO.getCartById(cid)
@@ -34,12 +37,13 @@ async function getCartById(req,res){
         cause: err,
         code: Errors.DATABASE_ERROR
     })
-    console.log(error)
+    req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
     res.json({status: "error", error})
     }
 }
 
 async function saveProductInCart(req,res){
+  req.logger = LOGGER
   try{
     const { cid, pid } = req.params;
     const result = await CARTS_DAO.saveProductCart(cid,pid)
@@ -51,12 +55,13 @@ async function saveProductInCart(req,res){
       cause: err,
       code: Errors.DATABASE_ERROR
   })
-  console.log(error)
+  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
   res.json({status: "error", error})
   }
 }
 
 async function updateCart(req,res){
+ req.logger = LOGGER
  try{
   const {cid} = req.params
   const {cart} = req.body
@@ -69,12 +74,13 @@ async function updateCart(req,res){
     cause: err,
     code: Errors.DATABASE_ERROR
 })
-console.log(error)
+req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
 res.json({status: "error", error})
  }
 }
 
 async function updateQuantityProductInCart(req,res){
+  req.logger = LOGGER
   try{
     const {cid,pid} = req.params
     const {quantity} = req.body
@@ -87,12 +93,13 @@ async function updateQuantityProductInCart(req,res){
       cause: err,
       code: Errors.DATABASE_ERROR
   })
-  console.log(error)
+  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
   res.json({status: "error", error})
   }
 }
 
 async function deleteProductsInCart(req,res){
+  req.logger = LOGGER
   try{
   const {cid} = req.params
   const result = await CARTS_DAO.deleteProductsCart(cid)
@@ -104,12 +111,13 @@ async function deleteProductsInCart(req,res){
       cause: err,
       code: Errors.DATABASE_ERROR
   })
-  console.log(error)
+  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
   res.json({status: "error", error})
   }
 }
 
 async function deleteProductInCart(req,res){
+req.logger = LOGGER
 try{
   const {cid, pid} = req.params
   const result = await CARTS_DAO.deleteProductCart(cid,pid)
@@ -121,12 +129,13 @@ try{
     cause: err,
     code: Errors.DATABASE_ERROR
 })
-console.log(error)
+req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
 res.json({status: "error", error})
 }
 }
 
 async function purchaseProducts(req,res){
+  req.logger = LOGGER
   const {totalAmount,email,code} = req.body
   try{
     const newTicket = {
@@ -144,7 +153,7 @@ async function purchaseProducts(req,res){
       cause: err,
       code: Errors.DATABASE_ERROR
   })
-  console.log(error)
+  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
   res.json({status: "error", error})
   }
 }

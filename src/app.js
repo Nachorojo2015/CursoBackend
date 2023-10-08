@@ -22,6 +22,7 @@ import { ChatRepository } from "./dao/repository/chat.repository.js"
 import { MESSAGES_DAO } from "./dao/index.js"
 import { PRODUCTS_MODEL } from "./dao/mongo/models/products.js"
 import compression from "express-compression"
+import { loggerRouter } from "./Routes/logger.router.js"
 //Configuración del dotenv
 configuration()
 //Inicializar express
@@ -81,6 +82,7 @@ app.use("/carts",cartsRouter)
 app.use("/views",authToken,viewsRouter) 
 app.use("/chat",authToken,chatRouter)
 app.use("/",sessionRouter)
+app.use("/loggerTest",loggerRouter)
 
 //Inicializar el servidor con socket
 const server = app.listen(PORT,()=>{
