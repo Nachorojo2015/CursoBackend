@@ -11,7 +11,6 @@ const productsService = new ProductsRepository(PRODUCTS_DAO)
 async function getProducts(req,res){
     req.logger = LOGGER
     try{
-        throw new Error("Error products")
        const products = await productsService.getProducts(req,res)
        res.json({status: "Success", products})
     }catch(err){
@@ -47,7 +46,7 @@ async function getProductById(req,res){
 async function saveProduct(req,res){
     req.logger = LOGGER
     try{
-    const {title,description,code,price,stock,category,thumbnail} = req.body
+    const {title,description,code,price,stock,category,thumbnail,owner} = req.body
     if(!title || !description || !code || !price || !stock || !category || !thumbnail){
         const error = CustomErrors.generateError({
             name: "Faltan datos",
@@ -67,7 +66,8 @@ async function saveProduct(req,res){
             stock : +stock,
             category,
             thumbnail,
-            quantity : 1
+            quantity : 1,
+            owner: owner
         }
         const result = await productsService.saveProduct(newProduct)
         res.status(201).json({status: "Success", result})

@@ -4,8 +4,12 @@ import passport from "passport";
 import { generateToken, passportCall, authorization } from "../utils.js";
 import { UsersRepository } from "../dao/repository/users.repository.js";
 import { USER_DAO } from "../dao/index.js";
+import { transport } from "../mailler/nodemailer.js";
+import { createHash } from "../utils.js";
 
 const userService = new UsersRepository(USER_DAO)
+
+let userTemp = ""
 
 const sessionRouter = Router()
 
@@ -78,6 +82,54 @@ sessionRouter.get("/github",passport.authenticate("github",{scope:["user:email"]
 
 sessionRouter.get("/githubcallback",passport.authenticate("github",{failureRedirect: "/"}),async(req,res)=>{
     res.redirect("/views")
+})
+
+//Recuperar contraseña
+sessionRouter.get("/recover",(req,res)=>{
+    res.render("recoverPassword", {title: "Recover password", script: "recoverPassword.js", style: "recoverPassword.css", PORT: process.env.PORT})
+})
+
+sessionRouter.post("/recovePassword",async(req,res)=>{
+    const {mail} = req.body
+    try{
+      await transport.sendMail({
+        from: "Forgot password <coder123@gmail.com>", 
+        to: mail,
+        subject: "Forgot password",
+        headers: {
+            'Expiry-Date': new Date(Date.now() + 3600 * 1000).toUTCString()
+        },
+        html: `
+            <h1>Forgot password</h1>
+         <a href="http://localhost:${process.env.PORT}/replacePassword"><button>Recuperar contraseña</button></a>
+        `
+       })
+       userTemp = await userService.getUserByEmail(mail)
+       res.json({status: "success", message: "Mail sended"})
+    }catch(err){
+        console.log(err)
+    }
+})
+
+sessionRouter.get("/replacePassword",(req,res)=>{
+    res.render("replacePassword", {title: "Replace Password", style: "replacePassword.css", script: "replacePassword.js"})
+})
+
+sessionRouter.post("/replace",async(req,res)=>{
+    try{
+    const {pass} = req.body
+    const user = await userService.getUserByEmail(userTemp.email)
+    console.log(user.password)
+    if(isValidPassword(pass,user.password)){
+        return res.json({status: "error", message: "same password"})
+    }else{
+        user.password = createHash(pass)
+        const data = await userService.modifyUser(user.id,user)
+        res.json({status: "Success", message: "Password replaced", data})
+    }
+    }catch(err){
+        console.log(err)
+    }
 })
 
 export {sessionRouter}

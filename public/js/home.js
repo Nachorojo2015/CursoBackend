@@ -1,4 +1,6 @@
 let carrito = document.getElementById("id-carrito").href.split("/")[5]
+const emailUser = document.querySelector("h1").id
+const rolUser = document.querySelector("b").id
 
 const loc = window.location.href.split(":")
 
@@ -14,33 +16,45 @@ async function agregarAlCarrito(e){
    const response = await fetch(`/products/${pid}`)
    const dates = await response.json()
    const product = dates.product
-   if(product.stock <= 0){
+   console.log(emailUser)
+   console.log(product.owner)
+   if(product.owner === emailUser && rolUser === "premium"){
       Swal.fire({
          position: 'top-end',
          icon: 'error',
-         title: 'Producto sin stock',
+         title: 'No podes comprar tus propios productos',
          showConfirmButton: false,
          timer: 1500
        })
    }else{
-      fetch(`/carts/${carrito}/product/${pid}`, {
-         method: 'POST',
-       })
-      .then(response => response.json())
-      .then(data => {
+      if(product.stock <= 0){
          Swal.fire({
-             position: 'top-end',
-             icon: 'success',
-             title: 'Producto agregado correctamente',
-             showConfirmButton: false,
-             timer: 1500
-           })
-      })
-      .catch(error => {
-         console.log('Error:', error);
-      });
-     }
+            position: 'top-end',
+            icon: 'error',
+            title: 'Producto sin stock',
+            showConfirmButton: false,
+            timer: 1500
+          })
+      }else{
+         fetch(`/carts/${carrito}/product/${pid}`, {
+            method: 'POST',
+          })
+         .then(response => response.json())
+         .then(data => {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'Producto agregado correctamente',
+                showConfirmButton: false,
+                timer: 1500
+              })
+         })
+         .catch(error => {
+            console.log('Error:', error);
+         });
+        }
    }
+}
 
 botonCerrarSesion.addEventListener("click",async(e)=>{
    e.preventDefault()

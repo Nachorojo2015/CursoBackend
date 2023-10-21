@@ -49,7 +49,7 @@ async function showProducts(req,res){
 
 async function showRealTimeProducts(req,res){
     try{
-    res.render("realTimeProducts",{title: "Productos en tiempo real", script: "realTimeProducts.js", style: "realTimeProducts.css"})
+    res.render("realTimeProducts",{title: "Productos en tiempo real", script: "realTimeProducts.js", style: "realTimeProducts.css", user: req.user.user.email})
     }catch(err){
         console.log(err)
     }

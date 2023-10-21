@@ -21,4 +21,8 @@ export class UsersMongoDao{
     async getUserById(id){
         return await USER_MODEL.findById(id)
     }
+
+    async modifyUser(id,user){
+        return await USER_MODEL.findByIdAndUpdate(id,user)
+    }
 }

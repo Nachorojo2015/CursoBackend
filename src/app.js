@@ -23,6 +23,7 @@ import { MESSAGES_DAO } from "./dao/index.js"
 import { PRODUCTS_MODEL } from "./dao/mongo/models/products.js"
 import compression from "express-compression"
 import { loggerRouter } from "./Routes/logger.router.js"
+import { usersRouter } from "./Routes/users.router.js"
 //Configuración del dotenv
 configuration()
 //Inicializar express
@@ -83,11 +84,13 @@ app.use("/views",authToken,viewsRouter)
 app.use("/chat",authToken,chatRouter)
 app.use("/",sessionRouter)
 app.use("/loggerTest",loggerRouter)
+app.use("/api/users",usersRouter)
+
 
 //Inicializar el servidor con socket
 const server = app.listen(PORT,()=>{
     console.log("Escuchando desde el puerto " + PORT + " en modo " + ENVIRONMENT) 
-})
+}) 
  
 server.on("error",(err)=>{
     console.log(err)
