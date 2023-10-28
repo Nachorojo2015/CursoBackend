@@ -7,7 +7,7 @@ const cartsRouter = Router()
 cartsRouter.post("/",createCart)
 //Tomar carrito por id
 cartsRouter.get("/:cid",getCartById)
-//Tomar carrito por id y sumarle un producto
+//Tomar carrito por id y sumarle un producto 
 cartsRouter.post("/:cid/product/:pid",saveProductInCart)
 //Eliminar del carrito el producto seleccionado
 cartsRouter.delete("/:cid/products/:pid",deleteProductInCart)

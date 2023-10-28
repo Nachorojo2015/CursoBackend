@@ -1,27 +1,30 @@
 //IMPORTACIONES
 import express from "express"
 import { engine } from "express-handlebars"
-import {viewsRouter} from "./Routes/view.router.js"
 import { Server } from "socket.io"
 import path from "path"
-import { __dirname, authToken } from "./utils.js"
 import mongoose from "mongoose"
+import session from "express-session"
+import MongoStore from "connect-mongo"
+import passport from "passport"
+import cookieParser from "cookie-parser"
+import compression from "express-compression"
+import swaggerJSDoc from "swagger-jsdoc"
+import swaggerUiExpress from "swagger-ui-express"
+
+import {viewsRouter} from "./Routes/view.router.js"
+import { __dirname, authToken } from "./utils.js"
 import {productsRouter} from "./Routes/products.router.js"
 import {cartsRouter} from "./Routes/carts.router.js"
 import {chatRouter} from "./Routes/chat.router.js"
 import {sessionRouter} from "./Routes/session.router.js"
-import session from "express-session"
-import MongoStore from "connect-mongo"
-import passport from "passport"
 import {intializePassport} from "./config/passport.config.js"
-import cookieParser from "cookie-parser"
 import {configuration} from "./config.js"
 import { ProductsRepository } from "./dao/repository/products.repository.js"
 import { PRODUCTS_DAO } from "./dao/index.js"
 import { ChatRepository } from "./dao/repository/chat.repository.js"
 import { MESSAGES_DAO } from "./dao/index.js"
 import { PRODUCTS_MODEL } from "./dao/mongo/models/products.js"
-import compression from "express-compression"
 import { loggerRouter } from "./Routes/logger.router.js"
 import { usersRouter } from "./Routes/users.router.js"
 //Configuración del dotenv
@@ -77,21 +80,35 @@ app.set('views', path.join(__dirname, "./views"));
 //Uso de la carpeta public para ver el contenido / comunicación cliente servidor
 app.use(express.static("../public"))
 
+//SWAGGER
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.1" ,
+        info: {   
+            title: "Documentación",
+            description: "Acciones de las rutas products y carts"
+        }
+    }, 
+    apis: [`${__dirname}/docs/**/*.yaml`]
+}
+
+const specs = swaggerJSDoc(swaggerOptions) 
+
 //Rutas
 app.use("/products",productsRouter)
 app.use("/carts",cartsRouter)
 app.use("/views",authToken,viewsRouter) 
 app.use("/chat",authToken,chatRouter)
-app.use("/",sessionRouter)
-app.use("/loggerTest",loggerRouter)
-app.use("/api/users",usersRouter)
-
+app.use("/",sessionRouter)   
+app.use("/loggerTest",loggerRouter) 
+app.use("/api/users",usersRouter) 
+app.use("/api/docs",swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
 
 //Inicializar el servidor con socket
 const server = app.listen(PORT,()=>{
     console.log("Escuchando desde el puerto " + PORT + " en modo " + ENVIRONMENT) 
-}) 
- 
+})  
+  
 server.on("error",(err)=>{
     console.log(err)
 })
@@ -133,7 +150,6 @@ ioServer.on("connection", async (socket) => {
     const productos = process.env.PORT === "8080" ? await PRODUCTS_MODEL.find({}).lean({}) : await productsService.getProducts()
     socket.emit("update-products", productos)
     
-
      /****/
 
     //Crear mensaje
@@ -154,11 +170,3 @@ ioServer.on("connection", async (socket) => {
         socket.emit("enviar-mensajes",mensajes)
     })
 });
-
-
-
-
-
-
-
-
