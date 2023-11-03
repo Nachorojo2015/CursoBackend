@@ -9,6 +9,6 @@ export class ProductsDTO{
       this.category = product.category.toUpperCase()
       this.thumbnail = product.thumbnail
       this.quantity = product.quantity
-      this.owner = product.owner
+      this.owner = product.owner || "admin"
     }
 }

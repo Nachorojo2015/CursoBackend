@@ -70,7 +70,7 @@ async function saveProduct(req,res){
             owner: owner
         }
         const result = await productsService.saveProduct(newProduct)
-        res.status(201).json({status: "Success", result})
+        res.status(200).json({status: "Success", result})
     }
     }catch(err){
         const error = CustomErrors.generateError({
@@ -110,7 +110,7 @@ async function modifyProduct(req,res){
          thumbnail
         }
         const result = await productsService.modifyProduct(pid,updateProduct)
-        res.status(201).json({status: "Success", result})
+        res.status(200).json({status: "Success", result})
     }
     }catch(err){
         const error = CustomErrors.generateError({
@@ -129,7 +129,7 @@ async function deleteProduct(req,res){
     try{
     const {pid} = req.params
     const result = await productsService.deleteProduct(pid)
-    res.status(201).json({status: "Success", result})
+    res.status(200).json({status: "Success", result})
     }catch(err){
         const error = CustomErrors.generateError({
             name: "Products Error",

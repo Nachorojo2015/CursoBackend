@@ -63,10 +63,10 @@ async function saveProductInCart(req,res){
 async function updateCart(req,res){
  req.logger = LOGGER
  try{
-  const {cid} = req.params
   const {cart} = req.body
+  const {cid} = req.params
   const result = await CARTS_DAO.updateCart(cid,cart)
-  res.status(201).json({"message":"Carrito actualizado", result})
+  res.status(200).json({"message":"Carrito actualizado", result})
  }catch(err){
   const error = CustomErrors.generateError({
     name: "Cart Error",
