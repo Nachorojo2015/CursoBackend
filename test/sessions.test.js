@@ -10,7 +10,6 @@ let passwordUser = ""
 describe("Tests de los endpoints de la ruta sessions",()=>{
     describe("/register POST",()=>{
         it("Debe registrar un usuario",async()=>{
-            //{first_name,last_name,email,age,password}
             const randomNumber = Math.round(Math.random()*100)
             emailUser = `juan${randomNumber}@gmail.com`
             passwordUser = (Math.floor(Math.random()*100000)).toString()

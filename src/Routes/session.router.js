@@ -63,11 +63,15 @@ sessionRouter.get("/failLogin",(req,res)=>{
 })
 
 //Cerrar sesión
-sessionRouter.get("/logout",(req,res)=>{
-    req.session.destroy(err=>{
+sessionRouter.post("/logout",(req,res)=>{
+    req.session.destroy(async err=>{
         if(!err){
+           const {email} = req.body
+           const user = await userService.getUserByEmail(email)
+           user.last_connection = new Date()
+           const response = await userService.modifyUser(user.id,user)
            return res.json({
-            message: "Sesión cerrada"
+            message: "Sesión cerrada",response
            })
         }else{
            return res.json({

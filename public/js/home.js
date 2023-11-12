@@ -58,7 +58,13 @@ async function agregarAlCarrito(e){
 
 botonCerrarSesion.addEventListener("click",async(e)=>{
    e.preventDefault()
-   let response = await fetch("/logout")
+   let response = await fetch("/logout",{
+      method: "POST",
+      headers:{
+         'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({email:emailUser})
+   })
    let data = await response.json()
    setTimeout(()=>{
       window.location.href = loc[0]+":"+loc[1]+":"+loc[2].split("/")[0]
