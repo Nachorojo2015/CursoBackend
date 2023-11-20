@@ -12,47 +12,57 @@ buttons.forEach((button)=>{
 })
 
 async function agregarAlCarrito(e){
-   const pid = e.target.id 
-   const response = await fetch(`/products/${pid}`)
-   const dates = await response.json()
-   const product = dates.product
-   console.log(emailUser)
-   console.log(product.owner)
-   if(product.owner === emailUser && rolUser === "premium"){
+   if(rolUser === "admin"){
       Swal.fire({
          position: 'top-end',
          icon: 'error',
-         title: 'No podes comprar tus propios productos',
+         title: 'No podes comprar productos como administrador',
          showConfirmButton: false,
          timer: 1500
        })
    }else{
-      if(product.stock <= 0){
+      const pid = e.target.id 
+      const response = await fetch(`/products/${pid}`)
+      const dates = await response.json()
+      const product = dates.product
+      console.log(emailUser)
+      console.log(product.owner)
+      if(product.owner === emailUser && rolUser === "premium"){
          Swal.fire({
             position: 'top-end',
             icon: 'error',
-            title: 'Producto sin stock',
+            title: 'No podes comprar tus propios productos',
             showConfirmButton: false,
             timer: 1500
           })
       }else{
-         fetch(`/carts/${carrito}/product/${pid}`, {
-            method: 'POST',
-          })
-         .then(response => response.json())
-         .then(data => {
+         if(product.stock <= 0){
             Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: 'Producto agregado correctamente',
-                showConfirmButton: false,
-                timer: 1500
-              })
-         })
-         .catch(error => {
-            console.log('Error:', error);
-         });
-        }
+               position: 'top-end',
+               icon: 'error',
+               title: 'Producto sin stock',
+               showConfirmButton: false,
+               timer: 1500
+             })
+         }else{
+            fetch(`/carts/${carrito}/product/${pid}`, {
+               method: 'POST',
+             })
+            .then(response => response.json())
+            .then(data => {
+               Swal.fire({
+                   position: 'top-end',
+                   icon: 'success',
+                   title: 'Producto agregado correctamente',
+                   showConfirmButton: false,
+                   timer: 1500
+                 })
+            })
+            .catch(error => {
+               console.log('Error:', error);
+            });
+           }
+      }
    }
 }
 

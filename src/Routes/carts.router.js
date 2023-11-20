@@ -17,7 +17,7 @@ cartsRouter.put("/:cid",updateCart)
 cartsRouter.put("/:cid/products/:pid",updateQuantityProductInCart)
 //Eliminar todos los productos del carrito
 cartsRouter.delete("/:cid",deleteProductsInCart)
-// Comprar productos del carrito
+// Comprar productos del carrito y generar orden
 cartsRouter.post("/:cid/purchase",purchaseProducts)
 
 export {cartsRouter}

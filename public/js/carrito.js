@@ -59,7 +59,6 @@ console.log(totalProducts)
         if (response.ok) {
             const result = await response.json();
             console.log(result.message);
-            location.reload()
         } else {
             console.error("Error al vaciar el carrito");
         }
@@ -81,7 +80,7 @@ formComprar.addEventListener("submit",async(e)=>{
            const code = generateRandomPurchaseCode(10)
            const totalAmount = totalProducts.reduce((acc,product)=>acc+product.price*product.quantity,0)
            const idCarrito = cart
-           const response = await fetch(`/carts/${idCarrito}/purchase/`,{
+           const response = await fetch(`/carts/${idCarrito}/purchase`,{
             method: "POST",
             headers:{
                 'Content-Type': 'application/json',
@@ -90,14 +89,10 @@ formComprar.addEventListener("submit",async(e)=>{
           })
           const data = await response.json()
           console.log(data)
-           Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: 'Compra exitosa' + JSON.stringify(data), 
-            showConfirmButton: false,
-            timer: 1500
-          })
           vaciarCarrito()
+          setTimeout(()=>{
+            window.location.href = data.links[1].href
+          },1000)
     }catch(err){
         console.log(err)
     }

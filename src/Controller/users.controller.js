@@ -4,6 +4,7 @@ import { CustomErrors } from "../services/errors/customErrors.js";
 import { Errors } from "../services/errors/errors.js";
 import { LOGGER } from "../dao/index.js";
 import { __dirname } from "../utils.js";
+import { transport } from "../mailler/nodemailer.js";
 import fs from "fs"
 import path from "path"
 
@@ -26,7 +27,7 @@ async function changeRoleUser(req,res){
         req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
         res.json({status: "error", error}) 
         }else{
-          user.role = "premium" 
+          user.role = user.role === "premium" ? "user" : "premium"
           const response = await userService.modifyUser(uid,user)
           res.redirect("/")
         }
@@ -96,4 +97,69 @@ async function uploadImage(req,res){
   res.json({status: "error", error}) 
   }
 } 
-export {changeRoleUser, uploadImage}
+
+async function getUsers(req,res){
+  try{
+     const users = await userService.getUsers()
+     res.json({status: "Success",users: users.map(user=>({fullname: user.fullname, email: user.email, rol: user.role, age: user.age, id:user.id}))})
+  }catch(err){
+    const error = CustomErrors.generateError({
+      name: "User Error",
+      message: "Error database",
+      cause: err,
+      code: Errors.DATABASE_ERROR
+  })
+  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
+  res.json({status: "error", error}) 
+  }
+}
+
+async function deleteUsers(req,res){
+  try{
+     const users = await userService.getUsers()
+     for(let i = 0; i<users.length; i++){
+      const timeDiff = Math.abs(new Date().getTime() - users[i].last_connection.getTime());
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      if(daysDiff >= 2){
+        await transport.sendMail({
+          from: "Account deleted <coder123@gmail.com>", 
+          to: users[i].email,
+          subject: "User Account Deleted",
+          headers: {
+              'Expiry-Date': new Date(Date.now() + 3600 * 1000).toUTCString()
+          },
+          html:`<h1>Tu cuenta ha sido eliminada por inactividad</h1>`
+         })
+         await userService.deleteUser(users[i].id)
+      }
+     }
+     res.json({status: "Success", users})
+  }catch(err){
+    const error = CustomErrors.generateError({
+      name: "User Error",
+      message: "Error database",
+      cause: err,
+      code: Errors.DATABASE_ERROR
+  })
+  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
+  res.json({status: "error", error}) 
+  }
+}
+
+async function deleteUser(req,res){
+  const {uid} = req.params
+  try{
+     const response = await userService.deleteUser(uid)
+     res.json({status: "Success", response})
+  }catch(err){
+    const error = CustomErrors.generateError({
+      name: "User Error",
+      message: "Error database",
+      cause: err,
+      code: Errors.DATABASE_ERROR
+  })
+  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
+  res.json({status: "error", error}) 
+  }
+}
+export {changeRoleUser, uploadImage, getUsers, deleteUsers, deleteUser}

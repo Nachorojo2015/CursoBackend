@@ -5,7 +5,12 @@ import { generateUserErrorInfo } from "../services/errors/info.js";
 import { CustomErrors } from "../services/errors/customErrors.js";
 import { Errors } from "../services/errors/errors.js";
 import { LOGGER } from "../dao/index.js";
+import { USER_DAO } from "../dao/index.js";
+import { UsersRepository } from "../dao/repository/users.repository.js";
+import { transport } from "../mailler/nodemailer.js";
 
+
+const userService = new UsersRepository(USER_DAO)
 const productsService = new ProductsRepository(PRODUCTS_DAO)
 
 async function getProducts(req,res){
@@ -128,8 +133,24 @@ async function deleteProduct(req,res){
     req.logger = LOGGER
     try{
     const {pid} = req.params
-    const result = await productsService.deleteProduct(pid)
-    res.status(200).json({status: "Success", result})
+    const product = await productsService.getProductById(pid)
+    const user = await userService.getUserByEmail(product.owner)
+    if(user.role === "premium"){
+        const result = await productsService.deleteProduct(pid)
+        await transport.sendMail({
+            from: "Product deleted <coder123@gmail.com>", 
+            to: user.email,
+            subject: "User Product Deleted",
+            headers: {
+                'Expiry-Date': new Date(Date.now() + 3600 * 1000).toUTCString()
+            },
+            html:`<h1>Tu producto ha sido eliminado</h1>`
+           })
+           res.status(200).json({status: "Success", result})
+    }else{
+        const result = await productsService.deleteProduct(pid)
+        res.status(200).json({status: "Success", result})
+    }
     }catch(err){
         const error = CustomErrors.generateError({
             name: "Products Error",

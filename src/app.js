@@ -27,6 +27,10 @@ import { MESSAGES_DAO } from "./dao/index.js"
 import { PRODUCTS_MODEL } from "./dao/mongo/models/products.js"
 import { loggerRouter } from "./Routes/logger.router.js"
 import { usersRouter } from "./Routes/users.router.js"
+import { USER_DAO } from "./dao/index.js"
+import { UsersRepository } from "./dao/repository/users.repository.js"
+import { transport } from "./mailler/nodemailer.js"
+import { paymentsRouter } from "./Routes/payment.router.js"
 //Configuración del dotenv
 configuration()
 //Inicializar express
@@ -103,6 +107,7 @@ app.use("/",sessionRouter)
 app.use("/loggerTest",loggerRouter) 
 app.use("/api/users",usersRouter) 
 app.use("/api/docs",swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
+app.use(paymentsRouter)
 
 //Inicializar el servidor con socket
 const server = app.listen(PORT,()=>{
@@ -117,6 +122,7 @@ server.on("error",(err)=>{
 const ioServer = new Server(server)
 
 const productsService = new ProductsRepository(PRODUCTS_DAO)
+const userService = new UsersRepository(USER_DAO)
 const chatService = new ChatRepository(MESSAGES_DAO)
 
 //Conectarse
@@ -139,8 +145,22 @@ ioServer.on("connection", async (socket) => {
     //Se borra un producto en realTime 
     socket.on("delete-product",async(data)=>{  
         let id = data;
-        let result = await productsService.deleteProduct(id);
-        console.log("Producto eliminado", result);
+        const product = await productsService.getProductById(id)
+        const user = await userService.getUserByEmail(product.owner)
+        if(user.role === "premium"){
+            const result = await productsService.deleteProduct(id)
+            await transport.sendMail({
+                from: "Product deleted <coder123@gmail.com>", 
+                to: user.email,
+                subject: "User Product Deleted",
+                headers: {
+                    'Expiry-Date': new Date(Date.now() + 3600 * 1000).toUTCString()
+                },
+                html:`<h1>Tu producto ha sido eliminado</h1>`
+               })
+        }else{
+            const result = await productsService.deleteProduct(pid)
+        }
         //Se muestran los productos realTime
         const productos = process.env.PORT === "8080" ? await PRODUCTS_MODEL.find({}).lean({}) : await productsService.getProducts()
         socket.emit("update-products", productos)

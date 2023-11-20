@@ -3,6 +3,10 @@ import { TICKET_DAO } from "../dao/index.js"
 import { CustomErrors } from "../services/errors/customErrors.js";
 import { Errors } from "../services/errors/errors.js";
 import { LOGGER } from "../dao/index.js";
+import { configuration } from "../config.js";
+import axios from "axios"
+
+configuration()
 
 async function createCart(req,res){
       req.logger = LOGGER
@@ -135,26 +139,71 @@ res.json({status: "error", error})
 }
 
 async function purchaseProducts(req,res){
-  req.logger = LOGGER
   const {totalAmount,email,code} = req.body
   try{
+    const order = {
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          amount: {
+            currency_code: "USD",
+            value: totalAmount.toString(),
+          },
+        },
+      ],
+      application_context: {
+        brand_name: "ecommerce.com",
+        landing_page: "NO_PREFERENCE",
+        user_action: "PAY_NOW",
+        return_url: `http://localhost:8080/capture-order`,
+        cancel_url: `http://localhost:8080/cancel-order`,
+      },
+    };
+
+    // format the body
+    const params = new URLSearchParams();
+    params.append("grant_type", "client_credentials");
+
+    // Generate an access token
+    const {
+      data: { access_token },
+    } = await axios.post(
+      "https://api-m.sandbox.paypal.com/v1/oauth2/token",
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        auth: {
+          username: process.env.PAYPAL_API_CLIENT,
+          password: process.env.PAYPAL_API_KEY,
+        },
+      }
+    );
+
+     // make a request
+     const response = await axios.post(
+      `${process.env.PAYPAL_API}/v2/checkout/orders`,
+      order,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
     const newTicket = {
-        code,
-        purchase_datetime: new Date(),
-        amount: totalAmount,
-        purchaser: email
-    }
-    const ticket = TICKET_DAO.saveTicket(newTicket)
-    res.json({status: "Success", ticket})
+      code,
+      purchase_datetime: new Date(),
+      amount: totalAmount,
+      purchaser: email
+  }
+   await TICKET_DAO.saveTicket(newTicket)
+
+  res.json(response.data)
   }catch(err){
-    const error = CustomErrors.generateError({
-      name: "Cart Error",
-      message: "Error purchase cart",
-      cause: err,
-      code: Errors.DATABASE_ERROR
-  })
-  req.logger.error("Error " + JSON.stringify(error) + " " + new Date().toDateString())
-  res.json({status: "error", error})
+    console.log(err)
+    res.json({message: "Something goes wrong"})
   }
 }
 

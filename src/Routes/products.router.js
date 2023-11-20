@@ -11,7 +11,7 @@ productsRouter.get("/:pid",getProductById)
 productsRouter.post("/",saveProduct)
 //Modificar un producto
 productsRouter.put("/:pid",modifyProduct)
-//Borrar un producto
+// Borrar un producto
 productsRouter.delete("/:pid",deleteProduct)
 //Modificar producto stock
 productsRouter.put("/stock/:pid", modifyStockProduct)

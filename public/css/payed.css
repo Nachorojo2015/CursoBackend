@@ -1,0 +1,14 @@
+body{
+    background-color: whitesmoke;
+}
+
+h1{
+    font-family: 'Raleway', sans-serif;
+    color: #3498db;
+    text-align: center;
+}
+
+a{
+    text-decoration: none;
+    font-size: 15px;
+}

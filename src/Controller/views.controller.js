@@ -49,7 +49,7 @@ async function showProducts(req,res){
 
 async function showRealTimeProducts(req,res){
     try{
-    res.render("realTimeProducts",{title: "Productos en tiempo real", script: "realTimeProducts.js", style: "realTimeProducts.css", user: req.user.user.email})
+    res.render("realTimeProducts",{title: "Productos en tiempo real", script: "realTimeProducts.js", style: "realTimeProducts.css", user: req.user.user.email, role: req.user.user.role})
     }catch(err){
         console.log(err)
     }
@@ -79,4 +79,12 @@ async function showCart(req,res){
   }
 } 
 
-export { showProducts, showRealTimeProducts, showCart } 
+async function showUsers(req,res){
+  try{
+    res.render("users",{title: "Users", script: "users.js", style: "users.css"})
+  }catch(err){
+    console.log(err)
+  }
+}
+
+export { showProducts, showRealTimeProducts, showCart, showUsers } 
