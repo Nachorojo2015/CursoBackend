@@ -9,5 +9,5 @@ PARA ESTE PROYECTO SE USÓ EXPRESS JS Y DEMÁS DEPENDECIAS VINCULADAS PARA UN ME
 COMANDOS PARA LEVANTAR EL PROYECTO:
 npm i
 cd src
-npx nodemon npx nodemon .\app.js
+npx nodemon .\app.js
 
