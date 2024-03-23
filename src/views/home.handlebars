@@ -1,36 +1,66 @@
-<h1 class="title-home" id={{email}}>Productos</h1>
-<a href="" id="cerrarSesion">Cerrar Sesion</a>
-<p>Bienvenido {{fullname}}</p>
-<p>Mail: {{email}}</p>
-<p>Rol: {{rol}}</p>
-<b id={{rol}}>.</b>
-<a href="http://localhost:{{PORT}}/views/carts/{{idCart}}" id="id-carrito"><span class="material-symbols-outlined">
-shopping_cart
-</span></a>
+<header>
+  <nav>
+    <h1 class="title-home" id={{email}}>Productos</h1>
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="icon icon-tabler icons-tabler-outline icon-tabler-user"
+        style="vertical-align: middle; margin-bottom: 16px;"
+      ><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path
+          d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"
+        /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
+      <p style="border-right: 1px solid white; padding-right: 8px;">{{fullname}}</p>
+      <p style="border-right: 1px solid white; padding-right: 8px;">Mail: {{email}}</p>
+      <p>Rol: {{rol}}</p>
+      <b id={{rol}} style="color: #000;">.</b>
+    </div>
+    <a
+      href="http://localhost:{{PORT}}/views/carts/{{idCart}}"
+      id="id-carrito"
+      style="text-decoration: none; color: white;"
+    ><span class="material-symbols-outlined">
+        shopping_cart
+      </span></a>
+    <a href="" id="cerrarSesion">Cerrar Sesion</a>
+  </nav>
+</header>
 <div class="container-products">
-    {{#each productos}}
- <div class="card" style="width: 18rem;">
-  <img src="{{this.thumbnail}}" className="card-img-top" alt="{{this.title}}">
-  <div class="card-body">
-    <h5 class="card-title">{{this.title}}</h5>
-    <p class="card-text">{{this.description}}</p>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">{{this.code}}</li>
-    <li class="list-group-item">${{this.price}}</li>
-    <li class="list-group-item">Stock: {{this.stock}}</li>
-  </ul>
-  <div class="card-body">
-    <a href="#" class="card-link">{{this.status}}</a>
-    <a href="#" class="card-link">{{this.category}}</a>
-    <button class="btn btn-success" id="{{this._id}}">Agregar al Carrito</button>
-  </div>
-</div>
-    {{/each}}
+  {{#each productos}}
+
+  {{!-- My design --}}
+  <article style="font-size: 16px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); height: 100%; padding: 10px;">
+    <img src="{{this.thumbnail}}" alt="product" style="width: 300px; object-fit: contain;">
+    <div style="background-color: white; padding: 8px; text-align: left;">
+      <p style="font-weight: 500;">Title: {{this.title}}</p>
+      <p>Description: {{this.description}}</p>
+      <p>Price: ${{this.price}}</p>
+      {{#if this.stock}}   
+      <p>En Stock</p>
+      {{else}}
+      <p>Sin Stock</p>
+      {{/if}}
+      <p>Category: {{this.category}}</p>
+      <button class="btn btn-dark" style="width: 100%;" id="{{this._id}}">Agregar al Carrito</button>
+    </div>
+  </article>
+  {{!-- ---------- --}}
+  {{/each}}
 </div>
 {{#if hasPrevPage}}
- <a href="/views?limit={{limit}}&page={{prevPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Anterior</button></a>
+  <a
+    href="/views?limit={{limit}}&page={{prevPage}}&sort={{sort}}&query={{query}}"
+  ><button class="btn btn-danger">Anterior</button></a>
 {{/if}}
 {{#if hasNextPage}}
- <a href="/views?limit={{limit}}&page={{nextPage}}&sort={{sort}}&query={{query}}"><button class="btn btn-danger">Siguiente</button></a>
+  <a
+    href="/views?limit={{limit}}&page={{nextPage}}&sort={{sort}}&query={{query}}"
+  ><button class="btn btn-danger">Siguiente</button></a>
 {{/if}}

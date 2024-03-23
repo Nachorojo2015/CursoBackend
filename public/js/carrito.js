@@ -6,7 +6,7 @@ let botonesEliminar = document.getElementsByClassName("products")
         botonesEliminar[i].addEventListener("click",eliminarDelCarrito)
     }
 
-let formComprar = document.getElementById("comprar")
+let botonComprar = document.getElementById("comprar")
 
 const totalProducts = [] 
 
@@ -65,9 +65,10 @@ console.log(totalProducts)
     } catch (error) {
         console.error("Error de red:", error);
     }
+    window.location.reload();
     }
 
-formComprar.addEventListener("submit",async(e)=>{
+botonComprar.addEventListener("click",async(e)=>{
     e.preventDefault()
     try{
         totalProducts.forEach(async product=>{
